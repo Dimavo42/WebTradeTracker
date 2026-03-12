@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "MNpPQHFh8Dc=",
+  "dgSpecHash": "cWoxRU5dyws=",
   "success": true,
   "projectFilePath": "C:\\Users\\Dimai\\OneDrive\\שולחן העבודה\\Projects\\Muilem_Project\\backend\\TradeWebAPI\\TradeWebAPI.csproj",
   "expectedPackageFiles": [
@@ -36,6 +36,7 @@
     "C:\\Users\\Dimai\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.14.0\\microsoft.identitymodel.tokens.8.14.0.nupkg.sha512",
     "C:\\Users\\Dimai\\.nuget\\packages\\microsoft.openapi\\1.6.23\\microsoft.openapi.1.6.23.nupkg.sha512",
     "C:\\Users\\Dimai\\.nuget\\packages\\microsoft.sqlserver.server\\1.0.0\\microsoft.sqlserver.server.1.0.0.nupkg.sha512",
+    "C:\\Users\\Dimai\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.22.1\\microsoft.visualstudio.azure.containers.tools.targets.1.22.1.nupkg.sha512",
     "C:\\Users\\Dimai\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "C:\\Users\\Dimai\\.nuget\\packages\\swashbuckle.aspnetcore\\8.0.0\\swashbuckle.aspnetcore.8.0.0.nupkg.sha512",
     "C:\\Users\\Dimai\\.nuget\\packages\\swashbuckle.aspnetcore.annotations\\8.0.0\\swashbuckle.aspnetcore.annotations.8.0.0.nupkg.sha512",

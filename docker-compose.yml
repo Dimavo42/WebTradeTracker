@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+
+  frontend:
+    build:
+      context: ./frontend/trade-frontend
+      dockerfile: Dockerfile
+    container_name: trade_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - trade_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/TradeWebAPI/Dockerfile
+    container_name: trade_backend
+    ports:
+      - "5000:8080"
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Sql: "Server=db;Database=TradeDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;"
+    networks:
+      - trade_network
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: trade_sql
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourStrong!Passw0rd"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+    networks:
+      - trade_network
+
+volumes:
+  sql_data:
+
+networks:
+  trade_network:
