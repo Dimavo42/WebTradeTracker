@@ -1,21 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import "./App.css";
-import { createTrade, deleteTrade, getTrades } from "./api/tradesApi";
+import { createTrade, deleteTradesBySymbol, getTrades } from "./api/tradesApi";
 import type { CreateTradeRequest, Trade } from "./types/trade";
 
 function App() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const [form, setForm] = useState<CreateTradeRequest>({
-    symbol: "",
+    stockSymbol: "",
     quantity: 0,
-    entryPrice: 0,
-    status: "Open",
-    entryDate: new Date().toISOString().slice(0, 16),
+    tradeType: "Open",
+    price: 0,
+    tradeDate: new Date().toISOString().slice(0, 16),
   });
 
-  async function loadTrades() {
+  const loadTrades = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -26,11 +27,11 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     loadTrades();
-  }, []);
+  }, [loadTrades]);
 
   function handleChange(
     event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -39,10 +40,7 @@ function App() {
 
     setForm((prev) => ({
       ...prev,
-      [name]:
-        name === "quantity" || name === "entryPrice"
-          ? Number(value)
-          : value,
+      [name]: name === "quantity" || name === "price" ? Number(value) : value,
     }));
   }
 
@@ -54,11 +52,11 @@ function App() {
       await createTrade(form);
 
       setForm({
-        symbol: "",
+        stockSymbol: "",
         quantity: 0,
-        entryPrice: 0,
-        status: "Open",
-        entryDate: new Date().toISOString().slice(0, 16),
+        tradeType: "Open",
+        price: 0,
+        tradeDate: new Date().toISOString().slice(0, 16),
       });
 
       await loadTrades();
@@ -67,10 +65,10 @@ function App() {
     }
   }
 
-  async function handleDelete(id: number) {
+  async function handleDelete(symbol: string) {
     try {
       setError("");
-      await deleteTrade(id);
+      await deleteTradesBySymbol(symbol);
       await loadTrades();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -83,9 +81,9 @@ function App() {
 
       <form className="trade-form" onSubmit={handleSubmit}>
         <input
-          name="symbol"
-          placeholder="Symbol"
-          value={form.symbol}
+          name="stockSymbol"
+          placeholder="Stock Symbol"
+          value={form.stockSymbol}
           onChange={handleChange}
           required
         />
@@ -100,24 +98,28 @@ function App() {
         />
 
         <input
-          name="entryPrice"
+          name="price"
           type="number"
           step="0.01"
-          placeholder="Entry Price"
-          value={form.entryPrice}
+          placeholder="Price"
+          value={form.price}
           onChange={handleChange}
           required
         />
 
-        <select name="status" value={form.status} onChange={handleChange}>
+        <select
+          name="tradeType"
+          value={form.tradeType}
+          onChange={handleChange}
+        >
           <option value="Open">Open</option>
           <option value="Closed">Closed</option>
         </select>
 
         <input
-          name="entryDate"
+          name="tradeDate"
           type="datetime-local"
-          value={form.entryDate}
+          value={form.tradeDate}
           onChange={handleChange}
           required
         />
@@ -128,40 +130,50 @@ function App() {
       {error && <p className="error">{error}</p>}
       {loading && <p>Loading...</p>}
 
-      <table>
-        <thead>
-          <tr>
-            <th>Id</th>
-            <th>Symbol</th>
-            <th>Quantity</th>
-            <th>Entry Price</th>
-            <th>Status</th>
-            <th>Entry Date</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {trades.length === 0 ? (
+      <div className="table-wrapper">
+        <table>
+          <thead>
             <tr>
-              <td colSpan={7}>No trades found.</td>
+              <th>Id</th>
+              <th>Stock Id</th>
+              <th>Symbol</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Trade Type</th>
+              <th>Date</th>
+              <th>Fees</th>
+              <th>Action</th>
             </tr>
-          ) : (
-            trades.map((trade) => (
-              <tr key={trade.id}>
-                <td>{trade.id}</td>
-                <td>{trade.symbol}</td>
-                <td>{trade.quantity}</td>
-                <td>{trade.entryPrice}</td>
-                <td>{trade.status}</td>
-                <td>{new Date(trade.entryDate).toLocaleString()}</td>
-                <td>
-                  <button onClick={() => handleDelete(trade.id)}>Delete</button>
-                </td>
+          </thead>
+          <tbody>
+            {trades.length === 0 ? (
+              <tr>
+                <td colSpan={10}>No trades found.</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              trades.map((trade) => (
+                <tr key={trade.id}>
+                  <td>{trade.id}</td>
+                  <td>{trade.stockId}</td>
+                  <td>{trade.stockSymbol}</td>
+                  <td>{trade.quantity}</td> 
+                  <td>{trade.price}</td>
+                  <td>{trade.status}</td>
+                  <td>{trade.tradeType}</td>
+                  <td>{new Date(trade.tradeDate).toLocaleString()}</td>
+                  <td>{trade.fees}</td>
+                  <td>
+                    <button onClick={() => handleDelete(trade.stockSymbol)}>
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

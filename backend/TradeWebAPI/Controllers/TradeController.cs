@@ -77,15 +77,9 @@ namespace TradeWebAPI.Controllers
 
                 var result = await _tradeService.CreateTradeAsync(dto);
 
-                if (!result.IsSuccess)
+                if (result != AppStatus.Success)
                 {
-                    _logger.LogWarning(
-                        "TradeController.CreateTrade failed. Status: {Status}, StockId: {StockId}, TradeType: {TradeType}",
-                        result.Status,
-                        dto?.StockId,
-                        dto?.TradeType);
-
-                    return result.Status switch
+                    return result switch
                     {
                         AppStatus.InvalidRequest => BadRequest("Invalid request."),
                         AppStatus.InvalidQuantity => BadRequest("Quantity must be greater than 0."),
@@ -96,13 +90,9 @@ namespace TradeWebAPI.Controllers
                     };
                 }
 
-                var createdTrade = result.Data!;
+                _logger.LogInformation("TradeController.CreateTrade completed successfully.");
 
-                _logger.LogInformation(
-                    "TradeController.CreateTrade completed successfully. TradeId: {TradeId}",
-                    createdTrade.Id);
-
-                return CreatedAtAction(nameof(GetTrade), new { id = createdTrade.Id }, createdTrade);
+                return Created("", null);
             }
             catch (Exception ex)
             {
@@ -116,29 +106,29 @@ namespace TradeWebAPI.Controllers
             }
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteTrade(int id)
+        [HttpDelete("symbol/{symbol}")]
+        public async Task<IActionResult> DeleteTrade(string symbol)
         {
             try
             {
-                _logger.LogInformation("DeleteTrade started. TradeId: {TradeId}", id);
+                _logger.LogInformation("DeleteTrade started. TradeId: {TradeId}", symbol);
 
-                var deleted = await _tradeService.DeleteTradeAsync(id);
+                var deleted = await _tradeService.DeleteTradeAsync(symbol);
 
                 if (!deleted)
                 {
-                    _logger.LogWarning("DeleteTrade failed. Trade not found. TradeId: {TradeId}", id);
+                    _logger.LogWarning("DeleteTrade failed. Trade not found. symbol: {symbol}", symbol);
                     return NotFound();
                 }
 
 
-                _logger.LogInformation("DeleteTrade completed successfully. TradeId: {TradeId}", id);
+                _logger.LogInformation("DeleteTrade completed successfully. symbol: {symbol}", symbol);
 
                 return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while deleting trade. TradeId: {TradeId}", id);
+                _logger.LogError(ex, "Error while deleting trade. TradeId: {TradeId}", symbol);
                 return StatusCode(500, "An error occurred while deleting the trade.");
             }
 

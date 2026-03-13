@@ -28,12 +28,20 @@ builder.Services.AddCors(options =>
     options.AddPolicy("frontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173")
+            policy.WithOrigins(
+                    "http://localhost:3000",
+                    "http://localhost:5173"
+                  )
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
 });
 var app = builder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
 
 app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseMiddleware<ExceptionMiddleware>();
@@ -49,7 +57,7 @@ else
     app.UseHsts();
 }
 
- app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors("frontend");
 

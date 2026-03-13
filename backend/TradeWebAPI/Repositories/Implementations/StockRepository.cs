@@ -15,7 +15,7 @@ namespace TradeWebAPI.Repositories.Implementations
 
         public async Task<IEnumerable<Stock>> GetAllAsync()
         {
-            return await _context.Stocks.ToListAsync();
+            return await _context.Stocks.AsNoTracking().ToListAsync();
         }
 
         public async Task<Stock?> GetByIdAsync(int id)

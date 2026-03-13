@@ -12,6 +12,7 @@ namespace TradeWebAPI.Repositories.Interfaces
 
         void Update(Trade trade);
 
-        void Delete(Trade trade);
+        Task<bool> DeleteTradesByStockSymbolAsync(string symbol);
+
     }
 }

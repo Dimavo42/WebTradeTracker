@@ -7,12 +7,9 @@ namespace TradeWebAPI.Services.Implementations
 {
     public class TradeValidator : ITradeValidator
     {
-        private readonly IUnitOfWork _unitOfWork;
 
-
-        public TradeValidator(IUnitOfWork unitOfWork)
+        public TradeValidator()
         {
-            _unitOfWork = unitOfWork;
         }
 
 
@@ -30,13 +27,10 @@ namespace TradeWebAPI.Services.Implementations
             if (dto.TradeDate > DateTime.UtcNow)
                 return AppStatus.InvalidTradeDate;
 
-            var stockExists = await _unitOfWork.Stocks
-                .ExistsBySymbolAsync(dto.StockSymbol);
+            if (string.IsNullOrWhiteSpace(dto.StockSymbol))
+                return AppStatus.InvalidRequest;
 
-            if (!stockExists)
-                return AppStatus.StockNotFound;
-
-            return AppStatus.Success;
+            return await Task.FromResult(AppStatus.Success);
         }
 
     }

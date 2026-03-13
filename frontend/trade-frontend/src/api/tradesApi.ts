@@ -1,6 +1,6 @@
 import type { CreateTradeRequest, Trade } from "../types/trade";
 
-const BASE_URL = "https://localhost:7060/api/trades"; // change to your backend port
+const BASE_URL = "http://localhost:5000/api/trade";
 
 export async function getTrades(): Promise<Trade[]> {
   const response = await fetch(BASE_URL);
@@ -28,12 +28,22 @@ export async function createTrade(data: CreateTradeRequest): Promise<Trade> {
   return response.json();
 }
 
-export async function deleteTrade(id: number): Promise<void> {
+export async function deleteTradeById(id: number): Promise<void> {
   const response = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
   });
 
   if (!response.ok) {
     throw new Error("Failed to delete trade");
+  }
+}
+
+export async function deleteTradesBySymbol(symbol: string): Promise<void> {
+  const response = await fetch(`${BASE_URL}/symbol/${symbol}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete trades");
   }
 }

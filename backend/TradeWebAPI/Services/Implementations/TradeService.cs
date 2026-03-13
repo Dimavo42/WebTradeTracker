@@ -27,48 +27,75 @@ namespace TradeWebAPI.Services.Implementations
             _tradeValidator = tradeValidator;
         }
 
-        public async Task<ServiceResult<TradeDto>> CreateTradeAsync(CreateTradeDto createTradeDto)
+        public async Task<AppStatus> CreateTradeAsync(CreateTradeDto dto)
         {
             _logger.LogInformation("TradeService.CreateTradeAsync started.");
 
-            var validationStatus = await _tradeValidator.ValidateCreateTradeAsync(createTradeDto);
-
+            var validationStatus = await _tradeValidator.ValidateCreateTradeAsync(dto);
             if (validationStatus != AppStatus.Success)
             {
                 _logger.LogWarning("Trade validation failed. Status: {Status}", validationStatus);
-                return ServiceResult<TradeDto>.Failure(validationStatus);
+                return validationStatus;
             }
 
-            var trade = _mapper.Map<Trade>(createTradeDto);
-            trade.EntryDate = trade.EntryDate == default ? DateTime.UtcNow : trade.EntryDate;
-            trade.CreatedAt = DateTime.UtcNow;
-            trade.Status = string.IsNullOrWhiteSpace(trade.Status) ? "Open" : trade.Status;
+            var normalizedSymbol = dto.StockSymbol.Trim().ToUpper();
+
+            var stock = await _unitOfWork.Stocks.GetBySymbolAsync(normalizedSymbol);
+
+            if (stock == null)
+            {
+                stock = new Stock
+                {
+                    Symbol = normalizedSymbol,
+                    CompanyName = normalizedSymbol
+                };
+
+                await _unitOfWork.Stocks.AddAsync(stock);
+            }
+
+            var trade = new Trade
+            {
+                Stock = stock,
+                Quantity = dto.Quantity,
+                EntryPrice = dto.Price,
+                EntryDate = dto.TradeDate,
+                TradeType = dto.TradeType
+            };
 
             await _unitOfWork.Trades.AddAsync(trade);
             await _unitOfWork.CompleteAsync();
 
-            var tradeDto = _mapper.Map<TradeDto>(trade);
-
-            return ServiceResult<TradeDto>.Success(tradeDto);
+            _logger.LogInformation("TradeService.CreateTradeAsync completed successfully.");
+            return AppStatus.Success;
         }
 
-        public async Task<bool> DeleteTradeAsync(int id)
+        public async Task<bool> DeleteTradeAsync(string symbol)
         {
-            _logger.LogInformation("TradeService.DeleteTradeAsync started. TradeId: {TradeId}", id);
+            _logger.LogInformation("DeleteTradeAsync started. Symbol: {Symbol}", symbol);
 
-            var trade = await _unitOfWork.Trades.GetByIdAsync(id);
-            if (trade == null)
+            if (string.IsNullOrWhiteSpace(symbol))
             {
-                _logger.LogWarning("TradeService.DeleteTradeAsync: Trade not found. TradeId: {TradeId}", id);
+                _logger.LogWarning("DeleteTradeAsync failed: symbol is empty.");
                 return false;
             }
 
-            _unitOfWork.Trades.Delete(trade);
+            symbol = symbol.Trim().ToUpper();
+
+            var deleted = await _unitOfWork.Trades.DeleteTradesByStockSymbolAsync(symbol);
+
+            if (!deleted)
+            {
+                _logger.LogWarning("DeleteTradeAsync: No trades found for symbol: {Symbol}", symbol);
+                return false;
+            }
+
             await _unitOfWork.CompleteAsync();
 
-            _logger.LogInformation("TradeService.DeleteTradeAsync completed. TradeId: {TradeId}", id);
+            _logger.LogInformation("DeleteTradeAsync completed. Symbol: {Symbol}", symbol);
+
             return true;
         }
+        
 
         public async Task<TradeDto?> GetTradeByIdAsync(int id)
         {

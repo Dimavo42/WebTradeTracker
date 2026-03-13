@@ -33,10 +33,6 @@ namespace TradeWebAPI.Repositories.Implementations
             await _context.Trades.AddAsync(trade);
         }
 
-        public void Delete(Trade trade)
-        {
-            _context.Trades.Remove(trade);
-        }
 
         public async Task<IEnumerable<Trade>> GetByStockIdAsync(int stockId)
         {
@@ -44,5 +40,20 @@ namespace TradeWebAPI.Repositories.Implementations
                 .Where(t => t.StockId == stockId)
                 .ToListAsync();
         }
+
+        public async Task<bool> DeleteTradesByStockSymbolAsync(string symbol)
+        {
+            var trades = await _context.Trades
+                .Where(t => t.Stock.Symbol == symbol)
+                .ToListAsync();
+
+            if (!trades.Any())
+                return false;
+
+            _context.Trades.RemoveRange(trades);
+
+            return true;
+        }
+
     }
 }

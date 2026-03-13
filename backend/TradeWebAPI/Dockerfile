@@ -6,11 +6,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY ["TradeWebAPI/TradeWebAPI.csproj", "TradeWebAPI/"]
-RUN dotnet restore "TradeWebAPI/TradeWebAPI.csproj"
+COPY ["backend/TradeWebAPI/TradeWebAPI.csproj", "backend/TradeWebAPI/"]
+RUN dotnet restore "backend/TradeWebAPI/TradeWebAPI.csproj"
 
 COPY . .
-WORKDIR "/src/TradeWebAPI"
+WORKDIR "/src/backend/TradeWebAPI"
 RUN dotnet publish "TradeWebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
