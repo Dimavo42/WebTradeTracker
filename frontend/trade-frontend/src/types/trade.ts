@@ -16,8 +16,9 @@ export type Trade = {
 
 export type CreateTradeRequest = {
   stockSymbol: string;
-  tradeType: string;
   quantity: number;
+  tradeType: string;
   price: number;
+  fees: number;
   tradeDate: string;
 };
