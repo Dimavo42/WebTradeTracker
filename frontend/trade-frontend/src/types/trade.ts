@@ -17,7 +17,8 @@ export type Trade = {
 export type CreateTradeRequest = {
   stockSymbol: string;
   quantity: number;
-  tradeType: string;
+  tradeType: "Buy" | "Sell";
+  status: "Open" | "Closed";
   price: number;
   fees: number;
   tradeDate: string;

@@ -8,8 +8,6 @@ type TradeRowProps = {
 export default function TradeRow({ trade, onDelete }: TradeRowProps) {
   return (
     <tr>
-      <td>{trade.id}</td>
-      <td>{trade.stockId}</td>
       <td>{trade.symbol}</td>
       <td>{trade.quantity}</td>
       <td>{trade.entryPrice}</td>
@@ -18,7 +16,12 @@ export default function TradeRow({ trade, onDelete }: TradeRowProps) {
       <td>{new Date(trade.entryDate).toLocaleString()}</td>
       <td>{trade.fees ?? "-"}</td>
       <td>
-        <button onClick={() => onDelete(trade.symbol)}>Delete</button>
+        <button
+          className="delete-btn"
+          onClick={() => onDelete(trade.symbol)}
+        >
+          Delete
+        </button>
       </td>
     </tr>
   );

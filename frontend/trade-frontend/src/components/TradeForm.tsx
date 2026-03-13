@@ -9,7 +9,8 @@ function getInitialForm(): CreateTradeRequest {
   return {
     stockSymbol: "",
     quantity: 0,
-    tradeType: "Open",
+    tradeType: "Buy",
+    status: "Open",
     price: 0,
     fees: 0,
     tradeDate: new Date().toISOString().slice(0, 16),
@@ -29,7 +30,9 @@ export default function TradeForm({ onSubmit }: TradeFormProps) {
       [name]:
         name === "quantity" || name === "price" || name === "fees"
           ? Number(value)
-          : value,
+          : name === "stockSymbol"
+            ? value.toUpperCase()
+            : value,
     }));
   }
 
@@ -41,7 +44,6 @@ export default function TradeForm({ onSubmit }: TradeFormProps) {
 
   return (
     <form className="trade-form" onSubmit={handleSubmit}>
-      
       <div className="form-group">
         <label htmlFor="stockSymbol">Stock Symbol</label>
         <input
@@ -95,11 +97,24 @@ export default function TradeForm({ onSubmit }: TradeFormProps) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="tradeType">Trade Status</label>
+        <label htmlFor="tradeType">Trade Type</label>
         <select
           id="tradeType"
           name="tradeType"
           value={form.tradeType}
+          onChange={handleChange}
+        >
+          <option value="Buy">Buy</option>
+          <option value="Sell">Sell</option>
+        </select>
+      </div>
+
+      <div className="form-group">
+        <label htmlFor="status">Status</label>
+        <select
+          id="status"
+          name="status"
+          value={form.status}
           onChange={handleChange}
         >
           <option value="Open">Open</option>
@@ -119,7 +134,9 @@ export default function TradeForm({ onSubmit }: TradeFormProps) {
         />
       </div>
 
-      <button type="submit">Add Trade</button>
+      <button type="submit" className="submit-btn">
+        Add Trade
+      </button>
     </form>
   );
 }

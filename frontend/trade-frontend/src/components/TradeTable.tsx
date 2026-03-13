@@ -12,8 +12,6 @@ export default function TradeTable({ trades, onDelete }: TradeTableProps) {
       <table>
         <thead>
           <tr>
-            <th>Id</th>
-            <th>Stock Id</th>
             <th>Symbol</th>
             <th>Quantity</th>
             <th>Price</th>
