@@ -12,8 +12,8 @@ export async function getTrades(): Promise<Trade[]> {
   return response.json();
 }
 
-export async function createTrade(data: CreateTradeRequest): Promise<Trade> {
-  const response = await fetch(BASE_URL, {
+export async function createTrade(data: CreateTradeRequest): Promise<void> {
+  const response = await fetch("http://localhost:5000/api/trade", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -22,10 +22,9 @@ export async function createTrade(data: CreateTradeRequest): Promise<Trade> {
   });
 
   if (!response.ok) {
-    throw new Error("Failed to create trade");
+    const errorText = await response.text();
+    throw new Error(errorText || `HTTP error ${response.status}`);
   }
-
-  return response.json();
 }
 
 export async function deleteTradeById(id: number): Promise<void> {
