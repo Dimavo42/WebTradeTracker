@@ -14,10 +14,10 @@ export default function TradeTable({ trades, onDelete }: TradeTableProps) {
           <tr>
             <th>Symbol</th>
             <th>Quantity</th>
-            <th>Price</th>
+            <th>Entry / Exit Price</th>
             <th>Status</th>
             <th>Trade Type</th>
-            <th>Date</th>
+            <th>Trade Date</th>
             <th>Fees</th>
             <th>Action</th>
           </tr>

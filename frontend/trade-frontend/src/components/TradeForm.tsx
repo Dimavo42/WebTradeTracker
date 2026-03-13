@@ -31,8 +31,8 @@ export default function TradeForm({ onSubmit }: TradeFormProps) {
         name === "quantity" || name === "price" || name === "fees"
           ? Number(value)
           : name === "stockSymbol"
-            ? value.toUpperCase()
-            : value,
+          ? value.toUpperCase()
+          : value,
     }));
   }
 
@@ -135,8 +135,8 @@ export default function TradeForm({ onSubmit }: TradeFormProps) {
       </div>
 
       <button type="submit" className="submit-btn">
-        Add Trade
-      </button>
+  Add Trade
+</button>
     </form>
   );
 }

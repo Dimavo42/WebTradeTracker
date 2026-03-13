@@ -70,8 +70,7 @@ namespace TradeWebAPI.Controllers
             try
             {
                 _logger.LogInformation(
-                    "TradeController.CreateTrade started. StockId: {StockId}, TradeType: {TradeType}, Quantity: {Quantity}",
-                    dto?.StockId,
+                    "TradeController.CreateTrade started.,TradeType: {TradeType}, Quantity: {Quantity}",
                     dto?.TradeType,
                     dto?.Quantity);
 
@@ -98,8 +97,7 @@ namespace TradeWebAPI.Controllers
             {
                 _logger.LogError(
                     ex,
-                    "Error while creating trade. StockId: {StockId}, TradeType: {TradeType}",
-                    dto?.StockId,
+                    "Error while creating trade.TradeType: {TradeType}",
                     dto?.TradeType);
 
                 return StatusCode(500, "An error occurred while creating the trade.");

@@ -4,6 +4,7 @@ import { createTrade, deleteTradesBySymbol, getTrades } from "./api/tradesApi";
 import type { CreateTradeRequest, Trade } from "./types/trade";
 import TradeForm from "./components/TradeForm";
 import TradeTable from "./components/TradeTable";
+import TradeStats from "./components/TradeStats";
 import ErrorMessage from "./components/ErrorMessage";
 
 function App() {
@@ -57,6 +58,8 @@ function App() {
       <ErrorMessage message={error} />
 
       {loading && <p>Loading...</p>}
+
+      <TradeStats trades={trades} />
 
       <TradeTable trades={trades} onDelete={handleDeleteTrade} />
     </div>

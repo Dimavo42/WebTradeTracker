@@ -2,15 +2,13 @@
 {
     public class CreateTradeDto
     {
-        public int StockId { get; set; }
-        public string TradeType { get; set; }
-        public int Quantity { get; set; }
-        public decimal EntryPrice { get; set; }
-
         public string StockSymbol { get; set; } = string.Empty;
+        public string TradeType { get; set; } = string.Empty; // Buy / Sell
+        public string Status { get; set; } = "Open";          // Open / Closed
+        public int Quantity { get; set; }
         public decimal Price { get; set; }
-
+        public decimal Fees { get; set; }
         public DateTime TradeDate { get; set; }
-       
+
     }
 }

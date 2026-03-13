@@ -57,10 +57,31 @@ namespace TradeWebAPI.Services.Implementations
             {
                 Stock = stock,
                 Quantity = dto.Quantity,
-                EntryPrice = dto.Price,
-                EntryDate = dto.TradeDate,
-                TradeType = dto.TradeType
+                TradeType = dto.TradeType,
+                Status = dto.Status,
+                Fees = dto.Fees,
+                CreatedAt = DateTime.UtcNow
             };
+
+            if (dto.TradeType == "Buy")
+            {
+                trade.EntryPrice = dto.Price;
+                trade.EntryDate = dto.TradeDate;
+                trade.ExitPrice = null;
+                trade.ExitDate = null;
+            }
+            else if (dto.TradeType == "Sell")
+            {
+                trade.EntryPrice = 0;
+                trade.EntryDate = dto.TradeDate;
+                trade.ExitPrice = dto.Price;
+                trade.ExitDate = dto.TradeDate;
+            }
+            else
+            {
+                _logger.LogWarning("Invalid trade type: {TradeType}", dto.TradeType);
+                return AppStatus.InvalidRequest;
+            }
 
             await _unitOfWork.Trades.AddAsync(trade);
             await _unitOfWork.CompleteAsync();
