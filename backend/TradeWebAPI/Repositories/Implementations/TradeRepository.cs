@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TradeWebAPI.DTOs;
 using TradeWebAPI.Entities;
 using TradeWebAPI.Repositories.Interfaces;
 
@@ -15,7 +16,7 @@ namespace TradeWebAPI.Repositories.Implementations
 
         public async Task<IEnumerable<Trade>> GetAllAsync()
         {
-            return await _context.Trades.ToListAsync();
+            return await _context.Trades.Include(t => t.Stock).ToListAsync();
         }
 
         public void Update(Trade trade)

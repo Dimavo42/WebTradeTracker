@@ -5,6 +5,8 @@
         public int Id { get; set; }
         public int StockId { get; set; }
         public string TradeType { get; set; } = string.Empty;
+
+        public string Symbol { get; set; }
         public int Quantity { get; set; }
         public decimal EntryPrice { get; set; }
         public decimal? ExitPrice { get; set; }

@@ -156,15 +156,15 @@ function App() {
                 <tr key={trade.id}>
                   <td>{trade.id}</td>
                   <td>{trade.stockId}</td>
-                  <td>{trade.stockSymbol}</td>
+                  <td>{trade.symbol}</td>
                   <td>{trade.quantity}</td> 
-                  <td>{trade.price}</td>
+                  <td>{trade.entryPrice}</td>
                   <td>{trade.status}</td>
                   <td>{trade.tradeType}</td>
-                  <td>{new Date(trade.tradeDate).toLocaleString()}</td>
+                  <td>{new Date(trade.entryDate).toLocaleString()}</td>
                   <td>{trade.fees}</td>
                   <td>
-                    <button onClick={() => handleDelete(trade.stockSymbol)}>
+                    <button onClick={() => handleDelete(trade.symbol)}>
                       Delete
                     </button>
                   </td>
