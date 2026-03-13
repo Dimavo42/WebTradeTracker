@@ -20,6 +20,25 @@ namespace TradeWebAPI.Controllers
         }
 
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateTrade(int id, [FromBody] UpdateTradeDto dto)
+        {
+            var result = await _tradeService.UpdateTradeAsync(id, dto);
+
+            if (result != AppStatus.Success)
+            {
+                return result switch
+                {
+                    AppStatus.NotFound => NotFound(),
+                    AppStatus.InvalidRequest => BadRequest(),
+                    _ => StatusCode(500)
+                };
+            }
+
+            return NoContent();
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> GetTrades()
         {

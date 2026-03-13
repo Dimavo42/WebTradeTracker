@@ -149,3 +149,24 @@ th {
   font-weight: 700;
   color: #111;
 }
+
+
+.edit-btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #2e7df6;
+  color: white;
+  font-size: 14px;
+  margin-right: 6px;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.edit-btn:hover {
+  background: #1f63c9;
+}
+
+.edit-btn:active {
+  transform: scale(0.96);
+}

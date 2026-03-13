@@ -23,3 +23,12 @@ export type CreateTradeRequest = {
   fees: number;
   tradeDate: string;
 };
+
+
+export type UpdateTradeRequest = {
+  quantity: number;
+  price: number;
+  fees?: number;
+  status: "Open" | "Closed";
+  tradeDate: string;
+};

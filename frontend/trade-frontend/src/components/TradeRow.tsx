@@ -3,9 +3,10 @@ import type { Trade } from "../types/trade";
 type TradeRowProps = {
   trade: Trade;
   onDelete: (symbol: string) => Promise<void>;
+  onEdit: (trade: Trade) => void;
 };
 
-export default function TradeRow({ trade, onDelete }: TradeRowProps) {
+export default function TradeRow({ trade, onDelete,onEdit }: TradeRowProps) {
   const displayPrice =
     trade.tradeType === "Buy"
       ? trade.entryPrice
@@ -26,6 +27,13 @@ export default function TradeRow({ trade, onDelete }: TradeRowProps) {
       <td>{displayDate ? new Date(displayDate).toLocaleString() : "-"}</td>
       <td>{trade.fees != null ? `₪${trade.fees.toFixed(2)}` : "-"}</td>
       <td>
+        <button
+          className="edit-btn"
+          onClick={() => onEdit(trade)}
+        >
+          Edit
+        </button>
+
         <button
           className="delete-btn"
           onClick={() => onDelete(trade.symbol)}

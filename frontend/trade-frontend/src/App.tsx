@@ -11,6 +11,7 @@ function App() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [editingTrade, setEditingTrade] = useState<Trade | null>(null);
 
   const loadTrades = useCallback(async () => {
     try {
@@ -28,6 +29,11 @@ function App() {
   useEffect(() => {
     loadTrades();
   }, [loadTrades]);
+
+
+  function handleEditTrade(trade: Trade) {
+  setEditingTrade(trade);
+}
 
   async function handleCreateTrade(form: CreateTradeRequest) {
     try {
@@ -53,7 +59,7 @@ function App() {
     <div className="container">
       <h1>Trade Journal</h1>
 
-      <TradeForm onSubmit={handleCreateTrade} />
+      <TradeForm onSubmit={handleCreateTrade} editingTrade={editingTrade} />
 
       <ErrorMessage message={error} />
 
@@ -61,7 +67,7 @@ function App() {
 
       <TradeStats trades={trades} />
 
-      <TradeTable trades={trades} onDelete={handleDeleteTrade} />
+      <TradeTable trades={trades} onDelete={handleDeleteTrade} onEdit={handleEditTrade} />
     </div>
   );
 }

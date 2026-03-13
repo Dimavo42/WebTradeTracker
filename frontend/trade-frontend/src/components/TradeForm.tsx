@@ -1,8 +1,9 @@
 import { useState } from "react";
-import type { CreateTradeRequest } from "../types/trade";
+import type { CreateTradeRequest, Trade } from "../types/trade";
 
 type TradeFormProps = {
   onSubmit: (form: CreateTradeRequest) => Promise<void>;
+  editingTrade: Trade | null;
 };
 
 function getInitialForm(): CreateTradeRequest {
@@ -35,6 +36,8 @@ export default function TradeForm({ onSubmit }: TradeFormProps) {
           : value,
     }));
   }
+
+  
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();

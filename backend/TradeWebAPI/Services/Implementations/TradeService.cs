@@ -27,6 +27,34 @@ namespace TradeWebAPI.Services.Implementations
             _tradeValidator = tradeValidator;
         }
 
+
+        public async Task<AppStatus> UpdateTradeAsync(int id, UpdateTradeDto dto)
+        {
+            var trade = await _unitOfWork.Trades.GetByIdAsync(id);
+
+            if (trade == null)
+                return AppStatus.NotFound;
+
+            trade.Quantity = dto.Quantity;
+            trade.Fees = dto.Fees;
+            trade.Status = dto.Status;
+
+            if (trade.TradeType == "Buy")
+            {
+                trade.EntryPrice = dto.Price;
+                trade.EntryDate = dto.TradeDate;
+            }
+            else
+            {
+                trade.ExitPrice = dto.Price;
+                trade.ExitDate = dto.TradeDate;
+            }
+
+            await _unitOfWork.CompleteAsync();
+
+            return AppStatus.Success;
+        }
+
         public async Task<AppStatus> CreateTradeAsync(CreateTradeDto dto)
         {
             _logger.LogInformation("TradeService.CreateTradeAsync started.");

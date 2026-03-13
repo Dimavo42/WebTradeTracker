@@ -9,7 +9,7 @@ namespace TradeWebAPI.Services.Interfaces
         Task<AppStatus> CreateTradeAsync(CreateTradeDto dto);
         Task<IEnumerable<TradeDto>> GetTradesAsync();
         Task<TradeDto?> GetTradeByIdAsync(int id);
-
+        Task<AppStatus> UpdateTradeAsync(int id, UpdateTradeDto dto);
         Task<bool> DeleteTradeAsync(string symbol);
     }
 }

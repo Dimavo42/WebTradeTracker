@@ -10,6 +10,7 @@
         InvalidPrice,
         InvalidTradeDate,
         StockNotFound,
-        InternalError
+        InternalError,
+        NotFound
     }
 }

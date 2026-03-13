@@ -4,9 +4,10 @@ import TradeRow from "./TradeRow";
 type TradeTableProps = {
   trades: Trade[];
   onDelete: (symbol: string) => Promise<void>;
+  onEdit: (trade: Trade) => void;
 };
 
-export default function TradeTable({ trades, onDelete }: TradeTableProps) {
+export default function TradeTable({ trades, onDelete,onEdit }: TradeTableProps) {
   return (
     <div className="table-wrapper">
       <table>
@@ -29,7 +30,7 @@ export default function TradeTable({ trades, onDelete }: TradeTableProps) {
             </tr>
           ) : (
             trades.map((trade) => (
-              <TradeRow key={trade.id} trade={trade} onDelete={onDelete} />
+              <TradeRow key={trade.id} trade={trade} onDelete={onDelete} onEdit={onEdit} />
             ))
           )}
         </tbody>
