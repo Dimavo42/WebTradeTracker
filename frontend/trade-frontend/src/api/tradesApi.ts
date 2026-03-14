@@ -13,7 +13,7 @@ export async function getTrades(): Promise<Trade[]> {
 }
 
 export async function createTrade(data: CreateTradeRequest): Promise<void> {
-  const response = await fetch("http://localhost:5000/api/trade", {
+  const response = await fetch(`${BASE_URL}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

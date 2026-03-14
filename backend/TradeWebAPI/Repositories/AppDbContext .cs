@@ -13,6 +13,8 @@ namespace TradeWebAPI.Repositories
 
         public  DbSet<Trade> Trades { get; set; }
 
+        public DbSet<User> Users { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -40,7 +42,6 @@ namespace TradeWebAPI.Repositories
                 entity.HasIndex(x => x.Symbol)
                     .IsUnique();
             });
-
             modelBuilder.Entity<Trade>(entity =>
             {
                 entity.HasKey(x => x.Id);
@@ -73,6 +74,30 @@ namespace TradeWebAPI.Repositories
                     .HasForeignKey(x => x.StockId)
                     .OnDelete(DeleteBehavior.Cascade);
 
+            });
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.Username)
+                    .IsRequired()
+                    .HasMaxLength(100);
+
+                entity.Property(x => x.Email)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(x => x.PasswordHash)
+                    .IsRequired()
+                    .HasMaxLength(500);
+
+                entity.Property(x => x.Role)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasDefaultValue("User");
+
+                entity.HasIndex(x => x.Email)
+                    .IsUnique();
             });
         }
     }
