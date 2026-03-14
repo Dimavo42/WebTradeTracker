@@ -8,7 +8,7 @@ export type Trade = {
   exitPrice: number | null;
   entryDate: string;
   exitDate: string | null;
-  status: string;
+  status: "Open" | "Closed";
   fees: number | null;
   notes: string | null;
   createdAt: string;

@@ -1,4 +1,4 @@
-import type { CreateTradeRequest, Trade,UpdateTradeRequest } from "../types/trade";
+import type { CreateTradeRequest, Trade, UpdateTradeRequest } from "../types/trade";
 
 const BASE_URL = "http://localhost:5000/api/trade";
 
@@ -37,13 +37,21 @@ export async function deleteTradeById(id: number): Promise<void> {
   }
 }
 
-export async function updateTrade(id: number, data: UpdateTradeRequest): Promise<void> {
-  const response = await fetch(`${BASE_URL}/${id}`, {
+export async function updateTradeFromModel(trade: Trade): Promise<void> {
+  const request: UpdateTradeRequest = {
+    quantity: trade.quantity,
+    price: trade.entryPrice,
+    fees: trade.fees ?? undefined,
+    status: trade.status,
+    tradeDate: trade.createdAt
+  };
+
+  const response = await fetch(`${BASE_URL}/${trade.id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(request),
   });
 
   if (!response.ok) {

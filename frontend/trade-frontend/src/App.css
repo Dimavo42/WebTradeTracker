@@ -170,3 +170,40 @@ th {
 .edit-btn:active {
   transform: scale(0.96);
 }
+
+
+/* Save Button */
+.save-btn {
+  background-color: #16a34a;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-right: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.save-btn:hover {
+  background-color: #15803d;
+  transform: translateY(-1px);
+}
+
+
+/* Cancel Button */
+.cancel-btn {
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.cancel-btn:hover {
+  background-color: #4b5563;
+  transform: translateY(-1px);
+}

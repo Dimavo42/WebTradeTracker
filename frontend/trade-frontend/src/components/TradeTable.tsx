@@ -3,11 +3,25 @@ import TradeRow from "./TradeRow";
 
 type TradeTableProps = {
   trades: Trade[];
+  editingTradeId: number | null;
+  editedTrade: Trade | null;
   onDelete: (symbol: string) => Promise<void>;
-  onEdit: (trade: Trade) => void;
+  onStartEdit: (trade: Trade) => void;
+  onCancelEdit: () => void;
+  onChangeEdit: (field: keyof Trade, value: string | number) => void;
+  onSaveEdit: () => Promise<void>;
 };
 
-export default function TradeTable({ trades, onDelete,onEdit }: TradeTableProps) {
+export default function TradeTable({
+  trades,
+  editingTradeId,
+  editedTrade,
+  onDelete,
+  onStartEdit,
+  onCancelEdit,
+  onChangeEdit,
+  onSaveEdit,
+}: TradeTableProps) {
   return (
     <div className="table-wrapper">
       <table>
@@ -26,11 +40,21 @@ export default function TradeTable({ trades, onDelete,onEdit }: TradeTableProps)
         <tbody>
           {trades.length === 0 ? (
             <tr>
-              <td colSpan={10}>No trades found.</td>
+              <td colSpan={8}>No trades found.</td>
             </tr>
           ) : (
             trades.map((trade) => (
-              <TradeRow key={trade.id} trade={trade} onDelete={onDelete} onEdit={onEdit} />
+              <TradeRow
+                key={trade.id}
+                trade={trade}
+                isEditing={editingTradeId === trade.id}
+                editedTrade={editedTrade}
+                onDelete={onDelete}
+                onStartEdit={onStartEdit}
+                onCancelEdit={onCancelEdit}
+                onChangeEdit={onChangeEdit}
+                onSaveEdit={onSaveEdit}
+              />
             ))
           )}
         </tbody>
