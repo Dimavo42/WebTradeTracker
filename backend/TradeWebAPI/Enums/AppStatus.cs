@@ -11,6 +11,7 @@
         InvalidTradeDate,
         StockNotFound,
         InternalError,
-        NotFound
+        NotFound,
+        AlreadyExists
     }
 }

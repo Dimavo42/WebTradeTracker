@@ -46,7 +46,8 @@ builder.Services.AddScoped<ITradeValidator, TradeValidator>();
 builder.Services.AddScoped<ITradeRepository, TradeRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("frontend",
@@ -80,8 +81,6 @@ else
 {
     app.UseHsts();
 }
-
-
 
 app.UseHttpsRedirection();
 

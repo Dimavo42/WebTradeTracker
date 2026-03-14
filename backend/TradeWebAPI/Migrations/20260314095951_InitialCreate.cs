@@ -73,7 +73,6 @@ namespace TradeWebAPI.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-
             migrationBuilder.InsertData(
                 table: "Stocks",
                 columns: new[] { "Id", "Symbol", "CompanyName", "Exchange", "Sector", "CreatedAt" },
