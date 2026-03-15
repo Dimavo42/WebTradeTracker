@@ -90,8 +90,10 @@ namespace TradeWebAPI.Migrations
                 columns: new[] { "Id", "Username", "Email", "PasswordHash", "Role" },
                 values: new object[,]
                 {
-                    { 1, "admin", "admin@test.com", "$2a$11$8fgN1ocr1xsZTdMSkoxi9ekTbP3PSpL46Y5JX8glOmmW/mmTI2/P2", "Admin" },
-                    { 2, "user", "user@test.com", "$2a$11$uCsbXye./bt2RozP0O9gWum5gp4m3uiQs7CRCHG5Jw1dxw1dDtIhe", "User" }
+                    //admin123
+                    //user123
+                    { 1, "admin", "admin@test.com", "$2b$10$tQv.ENeqjisPOg.iuSVglOkXvnOuhVf5oBgkxWlpyGlyRwrY19AyG", "Admin" },
+                    { 2, "user", "user@test.com", "$2b$10$1D/iavoSGh4BCTEDg4/KuOEEvK6fzM3jPraFDnJI7j2Bdf1YuDpKq", "User" }
                 });
 
             migrationBuilder.InsertData(
