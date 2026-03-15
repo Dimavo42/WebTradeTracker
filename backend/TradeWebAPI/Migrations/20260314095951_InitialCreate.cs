@@ -90,7 +90,7 @@ namespace TradeWebAPI.Migrations
                 columns: new[] { "Id", "Username", "Email", "PasswordHash", "Role" },
                 values: new object[,]
                 {
-                    //admin123
+                    //Admin123!
                     //user123
                     { 1, "admin", "admin@test.com", "$2b$10$tQv.ENeqjisPOg.iuSVglOkXvnOuhVf5oBgkxWlpyGlyRwrY19AyG", "Admin" },
                     { 2, "user", "user@test.com", "$2b$10$1D/iavoSGh4BCTEDg4/KuOEEvK6fzM3jPraFDnJI7j2Bdf1YuDpKq", "User" }
