@@ -12,6 +12,7 @@ import TradeStats from "../components/trade/TradeStats";
 import ErrorMessage from "../components/common/ErrorMessage";
 import styles from "./TradesPage.module.css";
 
+
 export default function TradesPage() {
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(false);
@@ -100,6 +101,7 @@ export default function TradesPage() {
 
   return (
     <div className={styles.container}>
+
       <h1 className={styles.title}>Trade Journal</h1>
 
       <TradeForm onSubmit={handleCreateTrade} />
