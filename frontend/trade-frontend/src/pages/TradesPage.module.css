@@ -1,0 +1,14 @@
+.container {
+  width: 95%;
+  max-width: 1600px;
+  margin: 30px auto;
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.title {
+  margin: 0 0 24px;
+  font-size: 28px;
+}

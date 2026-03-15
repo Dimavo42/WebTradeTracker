@@ -1,4 +1,4 @@
-import type { Trade } from "../types/trade";
+import type { Trade } from "../../types/trade";
 
 type TradeRowProps = {
   trade: Trade;
