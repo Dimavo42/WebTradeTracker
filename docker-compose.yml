@@ -22,6 +22,9 @@ services:
     container_name: trade_bff
     ports:
       - "3001:3000"
+    volumes:
+    - ./backend-bff:/app
+    - /app/node_modules
     depends_on:
       - backend
     environment:
