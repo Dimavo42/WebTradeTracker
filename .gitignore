@@ -1,34 +1,59 @@
-# Visual Studio
+# -----------------------------
+# Visual Studio / .NET
+# -----------------------------
 backend/.vs/
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
 
-# Build output
 bin/
 obj/
+TestResults/
 
-# Frontend
+# -----------------------------
+# Node / Frontend / NestJS
+# -----------------------------
 node_modules/
 dist/
 build/
+.pnpm-store/
 
-# Editors
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+coverage/
+
+# -----------------------------
+# Environment variables
+# -----------------------------
+.env
+.env.*
+.env.local
+.env.*.local
+
+# -----------------------------
+# Logs
+# -----------------------------
+logs/
+*.log
+
+# -----------------------------
+# Editors / IDE
+# -----------------------------
 .vscode/
 .idea/
 
-# Logs
-*.log
-
+# -----------------------------
 # OS files
+# -----------------------------
 .DS_Store
 Thumbs.db
 
-# Env files
-.env
-.env.*
-
-# Test output
-coverage/
-TestResults/
+# -----------------------------
+# Temp
+# -----------------------------
+tmp/
+temp/

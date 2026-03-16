@@ -15,6 +15,19 @@ services:
       - backend
     networks:
       - trade_network
+  bff:
+    build:
+      context: ./backend-bff
+      dockerfile: Dockerfile
+    container_name: trade_bff
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend
+    environment:
+      DOTNET_API_URL: http://backend:8080
+    networks:
+      - trade_network
 
   backend:
     build:
