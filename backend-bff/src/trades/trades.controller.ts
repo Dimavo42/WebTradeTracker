@@ -13,7 +13,7 @@ import { Trade } from './types/trade.types';
 import { CreateTradeDto } from './dto/create-trade.dto';
 import { UpdateTradeDto } from './dto/update-trade.dto';
 
-@Controller('api/trades')
+@Controller('trade')
 export class TradesController {
   constructor(private readonly tradesService: TradesService) {}
 

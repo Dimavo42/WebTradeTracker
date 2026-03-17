@@ -2,9 +2,16 @@ export type TradeType = 'Open' | 'Close';
 
 export interface Trade {
   id: number;
-  stockSymbol: string;
+  stockId: number;
+  symbol: string;
+  tradeType: string;
   quantity: number;
-  tradeType: TradeType;
-  price: number;
-  tradeDate: string;
+  entryPrice: number;
+  exitPrice: number | null;
+  entryDate: string;
+  exitDate: string | null;
+  status: 'Open' | 'Closed';
+  fees: number | null;
+  notes: string | null;
+  createdAt: string;
 }
