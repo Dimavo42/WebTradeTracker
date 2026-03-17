@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+
+import { TradesModule } from './trades/trades.module';
+import { TradesService } from './trades/trades.service';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [HttpModule],
+  controllers: [TradesModule],
+  providers: [TradesService],
 })
 export class AppModule {}

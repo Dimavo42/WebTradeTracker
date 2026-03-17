@@ -1,6 +1,6 @@
 import type { CreateTradeRequest, Trade, UpdateTradeRequest } from "../types/trade";
 
-const BASE_URL = "http://localhost:5000/api/trade";
+const BASE_URL = "http://localhost:3001/api/trade";
 
 export async function getTrades(): Promise<Trade[]> {
   const response = await fetch(BASE_URL);
@@ -13,7 +13,7 @@ export async function getTrades(): Promise<Trade[]> {
 }
 
 export async function createTrade(data: CreateTradeRequest): Promise<void> {
-  const response = await fetch(`${BASE_URL}`, {
+  const response = await fetch(BASE_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -43,7 +43,7 @@ export async function updateTradeFromModel(trade: Trade): Promise<void> {
     price: trade.entryPrice,
     fees: trade.fees ?? undefined,
     status: trade.status,
-    tradeDate: trade.createdAt
+    tradeDate: trade.createdAt,
   };
 
   const response = await fetch(`${BASE_URL}/${trade.id}`, {
@@ -60,8 +60,6 @@ export async function updateTradeFromModel(trade: Trade): Promise<void> {
   }
 }
 
-
-
 export async function deleteTradesBySymbol(symbol: string): Promise<void> {
   const response = await fetch(`${BASE_URL}/symbol/${symbol}`, {
     method: "DELETE",
@@ -70,5 +68,4 @@ export async function deleteTradesBySymbol(symbol: string): Promise<void> {
   if (!response.ok) {
     throw new Error("Failed to delete trades");
   }
-
 }
