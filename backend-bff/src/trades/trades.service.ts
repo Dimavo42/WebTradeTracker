@@ -57,7 +57,9 @@ export class TradesService {
   async deleteTradeBySymbol(symbol: string): Promise<void> {
     try {
       await firstValueFrom(
-        this.httpService.delete(`${this.backendUrl}/api/trade/${symbol}`),
+        this.httpService.delete(
+          `${this.backendUrl}/api/trade/symbol/${symbol}`,
+        ),
       );
     } catch (error) {
       console.error('Failed to delete trade:', error);
