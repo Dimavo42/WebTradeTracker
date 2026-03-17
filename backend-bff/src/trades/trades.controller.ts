@@ -35,7 +35,7 @@ export class TradesController {
     return this.tradesService.updateTrade(id, tradeDto);
   }
 
-  @Delete(':symbol')
+  @Delete('symbol/:symbol')
   deleteTradeBySymbol(@Param('symbol') symbol: string): Promise<void> {
     return this.tradesService.deleteTradeBySymbol(symbol);
   }
