@@ -17,7 +17,6 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const response = await register(form);
     dispatch(loginAction(response.token));
     navigate("/");

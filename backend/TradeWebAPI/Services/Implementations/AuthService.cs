@@ -33,8 +33,7 @@ namespace TradeWebAPI.Services.Implementations
                 return ServiceResult<AuthResponseDto>.Failure(AppStatus.InvalidRequest);
             }
 
-            if (string.IsNullOrWhiteSpace(request.Username) ||
-                string.IsNullOrWhiteSpace(request.Email) ||
+            if (string.IsNullOrWhiteSpace(request.Email) ||
                 string.IsNullOrWhiteSpace(request.Password))
             {
                 _logger.LogWarning("RegisterAsync failed: missing required fields.");
@@ -52,7 +51,6 @@ namespace TradeWebAPI.Services.Implementations
 
             var user = new User
             {
-                Username = request.Username.Trim(),
                 Email = normalizedEmail,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 Role = "User"
@@ -66,7 +64,6 @@ namespace TradeWebAPI.Services.Implementations
             var response = new AuthResponseDto
             {
                 Token = token,
-                Username = user.Username,
                 Email = user.Email,
                 Role = user.Role
             };
@@ -113,7 +110,6 @@ namespace TradeWebAPI.Services.Implementations
             var response = new AuthResponseDto
             {
                 Token = token,
-                Username = user.Username,
                 Email = user.Email,
                 Role = user.Role
             };

@@ -79,10 +79,6 @@ namespace TradeWebAPI.Repositories
             {
                 entity.HasKey(x => x.Id);
 
-                entity.Property(x => x.Username)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
                 entity.Property(x => x.Email)
                     .IsRequired()
                     .HasMaxLength(255);
