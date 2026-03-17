@@ -11,4 +11,7 @@ export type RegisterRequest = {
 
 export type AuthResponse = {
   token: string;
+  email: string;
+  username: string;
+  role: string;
 };

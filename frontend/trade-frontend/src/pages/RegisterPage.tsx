@@ -2,9 +2,12 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { register } from "../api/authApi";
 import styles from "../styles/Auth.module.css";
+import { useAppDispatch } from "../hooks/reduxHooks";
+import { login as loginAction } from "../features/auth/authSlice";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [form, setForm] = useState({
     email: "",
@@ -15,9 +18,9 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    await register(form);
-
-    navigate("/login");
+    const response = await register(form);
+    dispatch(loginAction(response.token));
+    navigate("/");
   };
 
   return (
@@ -28,18 +31,14 @@ export default function RegisterPage() {
         <input
           type="email"
           placeholder="Email"
-          onChange={(e) =>
-            setForm({ ...form, email: e.target.value })
-          }
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
           required
         />
 
         <input
           type="password"
           placeholder="Password"
-          onChange={(e) =>
-            setForm({ ...form, password: e.target.value })
-          }
+          onChange={(e) => setForm({ ...form, password: e.target.value })}
           required
         />
 
@@ -61,3 +60,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+

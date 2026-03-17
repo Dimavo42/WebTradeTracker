@@ -1,6 +1,6 @@
 import type { AuthResponse, LoginRequest, RegisterRequest } from "../types/auth";
 
-const BASE_URL = "http://localhost:5000/api/auth";
+const BASE_URL = "http://localhost:3001/api/auth";
 
 export async function login(data: LoginRequest): Promise<AuthResponse> {
   const response = await fetch(`${BASE_URL}/login`, {
