@@ -1,11 +1,11 @@
 FROM node:20 AS build
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile
 
 COPY . ./
-RUN npm run build
+RUN pnpm build
 
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
