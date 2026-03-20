@@ -1,4 +1,4 @@
-export class CreateStockDto {
+export interface CreateStockDto {
   symbol: string;
   companyName: string;
 }

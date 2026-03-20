@@ -1,6 +1,6 @@
 import { TradeType } from '../types/trade.types';
 
-export class UpdateTradeDto {
+export interface UpdateTradeDto {
   stockSymbol?: string;
   quantity?: number;
   tradeType?: TradeType;

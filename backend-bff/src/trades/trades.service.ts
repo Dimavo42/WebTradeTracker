@@ -2,8 +2,8 @@ import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Trade } from './types/trade.types';
-import { CreateTradeDto } from './dto/create-trade.dto';
-import { UpdateTradeDto } from './dto/update-trade.dto';
+import { CreateTradeDto } from './dto/createTrade.dto';
+import { UpdateTradeDto } from './dto/updateTrade.dto';
 
 @Injectable()
 export class TradesService {

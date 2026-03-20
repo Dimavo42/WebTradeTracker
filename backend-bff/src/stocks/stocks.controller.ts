@@ -13,7 +13,7 @@ import { JwtAuthGuard } from './jwtAuth.guard';
 import type { Request } from 'express';
 import { DeleteStockResponseDto } from './dto/deleteStockResponse.dto';
 import { StockDto } from './dto/stock.dto';
-import { CreateStockDto } from './dto/createStock.dto';
+import type { CreateStockDto } from './dto/createStock.dto';
 
 @Controller('stocks')
 @UseGuards(JwtAuthGuard)

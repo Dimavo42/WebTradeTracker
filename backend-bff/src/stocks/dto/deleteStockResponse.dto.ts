@@ -1,3 +1,3 @@
-export class DeleteStockResponseDto {
+export interface DeleteStockResponseDto {
   success: boolean;
 }

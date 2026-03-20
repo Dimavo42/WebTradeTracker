@@ -10,8 +10,8 @@ import {
 } from '@nestjs/common';
 import { TradesService } from './trades.service';
 import { Trade } from './types/trade.types';
-import { CreateTradeDto } from './dto/create-trade.dto';
-import { UpdateTradeDto } from './dto/update-trade.dto';
+import type { CreateTradeDto } from './dto/createTrade.dto';
+import type { UpdateTradeDto } from './dto/updateTrade.dto';
 
 @Controller('trade')
 export class TradesController {
