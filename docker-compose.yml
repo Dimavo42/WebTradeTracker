@@ -3,13 +3,13 @@ services:
 
   frontend:
     build:
-      context: ./frontend/trade-frontend
+      context: ./frontend
       dockerfile: Dockerfile
     container_name: trade_frontend
     ports:
       - "3000:80"
     volumes:
-    - ./frontend/trade-frontend:/app
+    - ./frontend:/app
     - /app/node_modules
     depends_on:
       - backend
