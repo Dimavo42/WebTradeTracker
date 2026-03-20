@@ -29,8 +29,8 @@ builder.Services
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
             ValidateLifetime = true,
-            ValidIssuer = "...",
-            ValidAudience = "...",
+            ValidIssuer = "TradeWebAPI",
+            ValidAudience = "TradeWebAPIUsers",
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes("very-long-secret-key"))
         };
