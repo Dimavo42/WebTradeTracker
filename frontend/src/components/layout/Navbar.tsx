@@ -29,10 +29,7 @@ export default function Navbar({ title = "Trade Tracker" }: NavbarProps) {
 
       <nav className={styles.links}>
         <Link to="/">Trades</Link>
-
-        {/* 👇 Only visible if logged in */}
         {isAuthenticated && <Link to="/stocks">Stocks</Link>}
-
         {isAuthenticated ? (
           <button onClick={handleLogout} className={styles.logoutBtn}>
             Logout
