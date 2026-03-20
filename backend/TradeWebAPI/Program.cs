@@ -36,7 +36,6 @@ builder.Services
         };
     });
 builder.Services.AddAuthorization();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -86,6 +85,7 @@ app.UseHttpsRedirection();
 
 app.UseCors("frontend");
 
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllers();

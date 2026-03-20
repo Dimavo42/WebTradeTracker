@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TradeWebAPI.DTOs;
 using TradeWebAPI.Services.Interfaces;
 
@@ -6,6 +7,7 @@ namespace TradeWebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class StocksController : BaseController
     {
         private readonly ILogger<StocksController> _logger;
