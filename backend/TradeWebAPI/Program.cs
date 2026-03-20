@@ -32,7 +32,7 @@ builder.Services
             ValidIssuer = "TradeWebAPI",
             ValidAudience = "TradeWebAPIUsers",
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("very-long-secret-key"))
+                Encoding.UTF8.GetBytes("ThisIsMySuperSecretJwtKey1234567890"))
         };
     });
 builder.Services.AddAuthorization();
