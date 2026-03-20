@@ -4,6 +4,7 @@ import Navbar from "../components/layout/Navbar";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import StockPage from "../pages/StockPage";
+import NotFoundPage from "../pages/NotFoundPage";
 
 
 export default function AppRouter() {
@@ -15,6 +16,7 @@ export default function AppRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/stocks" element={<StockPage />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
 
     </BrowserRouter>
