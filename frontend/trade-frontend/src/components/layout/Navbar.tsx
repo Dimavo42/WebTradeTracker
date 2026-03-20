@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
-
 import { useAppSelector, useAppDispatch } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
 
@@ -13,7 +12,7 @@ export default function Navbar({ title = "Trade Tracker" }: NavbarProps) {
   const navigate = useNavigate();
 
   const isAuthenticated = useAppSelector(
-    (state) => state.isAuthenticated
+    (state) => state.auth.isAuthenticated
   );
 
   const handleLogout = () => {
@@ -30,6 +29,9 @@ export default function Navbar({ title = "Trade Tracker" }: NavbarProps) {
 
       <nav className={styles.links}>
         <Link to="/">Trades</Link>
+
+        {/* 👇 Only visible if logged in */}
+        {isAuthenticated && <Link to="/stocks">Stocks</Link>}
 
         {isAuthenticated ? (
           <button onClick={handleLogout} className={styles.logoutBtn}>
