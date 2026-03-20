@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'very-long-secret-key',
+      secretOrKey: 'ThisIsMySuperSecretJwtKey1234567890',
       issuer: 'TradeWebAPI',
       audience: 'TradeWebAPIUsers',
     });
