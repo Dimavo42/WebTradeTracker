@@ -1,6 +1,5 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Request, Response, NextFunction } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,12 +10,9 @@ async function bootstrap() {
   });
 
   app.setGlobalPrefix('api');
-  app.use((req: Request, res: Response, next: NextFunction) => {
-    console.log(`[REQ] ${req.method} ${req.originalUrl}`);
-    next();
-  });
-
   await app.listen(3000);
 }
-// eslint-disable-next-line @typescript-eslint/no-floating-promises
-bootstrap();
+
+void bootstrap().catch((err) => {
+  console.error('Failed to start app', err);
+});

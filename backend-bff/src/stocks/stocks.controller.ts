@@ -8,7 +8,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { StocksService } from './stocks.service';
-import { JwtAuthGuard } from './jwtAuth.guard';
+import { JwtAuthGuard } from '../common/guards/jwtAuth.guard';
 import { DeleteStockResponseDto } from './dto/deleteStockResponse.dto';
 import { StockDto } from './dto/stock.dto';
 import type { CreateStockDto } from './dto/createStock.dto';

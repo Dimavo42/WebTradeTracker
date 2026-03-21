@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import type { JwtUser } from './types/jwtUser.type';
+import type { JwtUser } from '../../stocks/types/jwtUser.type';
 
 // Extracts the JWT from the Authorization header,
 // verifies the token signature using the shared secret,
