@@ -6,14 +6,13 @@ import {
   Param,
   Body,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { StocksService } from './stocks.service';
 import { JwtAuthGuard } from './jwtAuth.guard';
-import type { Request } from 'express';
 import { DeleteStockResponseDto } from './dto/deleteStockResponse.dto';
 import { StockDto } from './dto/stock.dto';
 import type { CreateStockDto } from './dto/createStock.dto';
+import { Token } from 'src/common/decorators/token.decorator';
 
 @Controller('stocks')
 @UseGuards(JwtAuthGuard)
@@ -21,41 +20,31 @@ export class StocksController {
   constructor(private readonly stocksService: StocksService) {}
 
   @Get()
-  async getStocks(@Req() req: Request): Promise<StockDto[]> {
-    return this.stocksService.getStocks(this.extractToken(req));
+  async getStocks(@Token() token: string): Promise<StockDto[]> {
+    return this.stocksService.getStocks(token);
   }
 
   @Get(':id')
   async getStockById(
     @Param('id') id: string,
-    @Req() req: Request,
+    @Token() token: string,
   ): Promise<StockDto> {
-    return this.stocksService.getStockById(Number(id), this.extractToken(req));
+    return this.stocksService.getStockById(Number(id), token);
   }
 
   @Post()
   async createStock(
     @Body() dto: CreateStockDto,
-    @Req() req: Request,
+    @Token() token: string,
   ): Promise<StockDto> {
-    return this.stocksService.createStock(dto, this.extractToken(req));
+    return this.stocksService.createStock(dto, token);
   }
 
   @Delete(':id')
   async deleteStock(
     @Param('id') id: string,
-    @Req() req: Request,
+    @Token() token: string,
   ): Promise<DeleteStockResponseDto> {
-    return this.stocksService.deleteStock(Number(id), this.extractToken(req));
-  }
-
-  private extractToken(req: Request): string {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader?.startsWith('Bearer ')) {
-      throw new Error('Missing or invalid Authorization header');
-    }
-
-    return authHeader.substring(7);
+    return this.stocksService.deleteStock(Number(id), token);
   }
 }

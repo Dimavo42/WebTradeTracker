@@ -1,0 +1,42 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.title {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.message {
+  font-size: 16px;
+  color: #666;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  border: 1px solid #eaeaea;
+}
+
+.symbol {
+  margin: 0 0 12px;
+  font-size: 22px;
+  color: #2f80ed;
+}
+
+.card p {
+  margin: 8px 0;
+  color: #333;
+  font-size: 14px;
+}

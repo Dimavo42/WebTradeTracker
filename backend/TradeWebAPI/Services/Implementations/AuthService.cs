@@ -64,6 +64,7 @@ namespace TradeWebAPI.Services.Implementations
             var response = new AuthResponseDto
             {
                 Token = token,
+                UserId = user.Id,
                 Email = user.Email,
                 Role = user.Role
             };
@@ -110,6 +111,7 @@ namespace TradeWebAPI.Services.Implementations
             var response = new AuthResponseDto
             {
                 Token = token,
+                UserId = user.Id,
                 Email = user.Email,
                 Role = user.Role
             };

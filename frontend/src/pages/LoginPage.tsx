@@ -2,7 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login as loginApi } from "../api/authApi";
 import { useAppDispatch } from "../hooks/reduxHooks";
+import styles from "../styles/auth.module.css";
 import { login as loginAction } from "../features/auth/authSlice";
+import ErrorMessage from "../components/common/ErrorMessage";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -32,10 +34,11 @@ export default function LoginPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+  <div className={styles.container}>
+    <form className={styles.card} onSubmit={handleSubmit}>
       <h2>Login</h2>
 
-      {error && <p>{error}</p>}
+      {error && <ErrorMessage message={error} />}
 
       <input
         type="email"
@@ -61,5 +64,6 @@ export default function LoginPage() {
         Don't have an account? <Link to="/register">Register</Link>
       </p>
     </form>
-  );
+  </div>
+);
 }
