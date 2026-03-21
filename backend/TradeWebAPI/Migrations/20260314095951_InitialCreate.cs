@@ -34,7 +34,6 @@ namespace TradeWebAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
                     PasswordHash = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     Role = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "User")
@@ -87,13 +86,13 @@ namespace TradeWebAPI.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "Username", "Email", "PasswordHash", "Role" },
+                columns: new[] { "Id", "Email", "PasswordHash", "Role" },
                 values: new object[,]
                 {
                     //Admin123!
                     //user123
-                    { 1, "admin", "admin@test.com", "$2b$10$tQv.ENeqjisPOg.iuSVglOkXvnOuhVf5oBgkxWlpyGlyRwrY19AyG", "Admin" },
-                    { 2, "user", "user@test.com", "$2b$10$1D/iavoSGh4BCTEDg4/KuOEEvK6fzM3jPraFDnJI7j2Bdf1YuDpKq", "User" }
+                    { 1, "admin@test.com", "$2b$10$tQv.ENeqjisPOg.iuSVglOkXvnOuhVf5oBgkxWlpyGlyRwrY19AyG", "Admin" },
+                    { 2,  "user@test.com", "$2b$10$1D/iavoSGh4BCTEDg4/KuOEEvK6fzM3jPraFDnJI7j2Bdf1YuDpKq", "User" }
                 });
 
             migrationBuilder.InsertData(

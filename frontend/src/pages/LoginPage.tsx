@@ -22,9 +22,7 @@ export default function LoginPage() {
 
     try {
       const response = await loginApi({ email, password });
-
       dispatch(loginAction(response.token));
-
       navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

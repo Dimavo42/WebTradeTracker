@@ -8,7 +8,7 @@ import { login as loginAction } from "../features/auth/authSlice";
 export default function RegisterPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
+  const [error, setError] = useState("");
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -17,7 +17,14 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const response = await register(form);
+    if (form.password !== form.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+    const response = await register({
+      email: form.email,
+      password: form.password,
+    });
     dispatch(loginAction(response.token));
     navigate("/");
   };
@@ -26,7 +33,7 @@ export default function RegisterPage() {
     <div className={styles.container}>
       <form onSubmit={handleSubmit} className={styles.card}>
         <h2>Register</h2>
-
+        {error && <p className={styles.error}>{error}</p>}
         <input
           type="email"
           placeholder="Email"
@@ -59,5 +66,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-

@@ -5,24 +5,32 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { AuthResponseDto } from './dto/authResponseDto.dto';
+import { ENV } from 'src/common/env';
 
 type ApiErrorResponse = {
   message?: string;
 };
 
 @Injectable()
+@UsePipes(
+  new ValidationPipe({
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
+  }),
+)
 export class AuthService {
   constructor(private readonly httpService: HttpService) {}
 
-  private readonly backendUrl =
-    process.env.DOTNET_API_URL || 'http://backend:8080';
+  private readonly backendUrl = ENV.DOTNET_API_URL;
 
   async login(dto: LoginDto): Promise<AuthResponseDto> {
     try {

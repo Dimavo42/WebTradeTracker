@@ -60,18 +60,14 @@ export default function TradesPage() {
 
   const handleSaveEdit = async () => {
     if (!editedTrade) return;
-
     try {
       setError("");
-
       await updateTradeFromModel(editedTrade);
-
       setTrades((prev) =>
         prev.map((trade) =>
           trade.id === editedTrade.id ? editedTrade : trade
         )
       );
-
       setEditingTradeId(null);
       setEditedTrade(null);
     } catch (err) {

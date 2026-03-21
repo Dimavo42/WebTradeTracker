@@ -4,13 +4,13 @@ import { firstValueFrom } from 'rxjs';
 import { Trade } from './types/trade.types';
 import { CreateTradeDto } from './dto/createTrade.dto';
 import { UpdateTradeDto } from './dto/updateTrade.dto';
+import { ENV } from 'src/common/env';
 
 @Injectable()
 export class TradesService {
   constructor(private readonly httpService: HttpService) {}
 
-  private readonly backendUrl =
-    process.env.DOTNET_API_URL || 'http://backend:8080';
+  private readonly backendUrl = ENV.DOTNET_API_URL;
 
   async getTrades(): Promise<Trade[]> {
     try {

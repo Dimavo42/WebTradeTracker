@@ -9,13 +9,13 @@ import { StockDto } from './dto/stock.dto';
 import { AxiosError } from 'axios';
 import { DeleteStockResponseDto } from './dto/deleteStockResponse.dto';
 import { CreateStockDto } from './dto/createStock.dto';
+import { ENV } from 'src/common/env';
 
 @Injectable()
 export class StocksService {
   constructor(private readonly httpService: HttpService) {}
 
-  private readonly backendUrl =
-    process.env.DOTNET_API_URL || 'http://backend:8080';
+  private readonly backendUrl = ENV.DOTNET_API_URL;
 
   async getStocks(token: string): Promise<StockDto[]> {
     try {
