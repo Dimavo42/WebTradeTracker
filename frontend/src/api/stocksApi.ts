@@ -1,6 +1,7 @@
+import { ENV } from "../common/env";
 import type { CreateStockDto, Stock } from "../types/stock";
 
-const API_BASE_URL = "http://localhost:3001/api/stocks";
+const BASE_URL = `${ENV.BASE_URL}/stocks`;
 
 function getAuthHeaders(token: string | null): HeadersInit {
   return {
@@ -10,7 +11,7 @@ function getAuthHeaders(token: string | null): HeadersInit {
 }
 
 export async function getStocks(token: string): Promise<Stock[]> {
-  const response = await fetch(API_BASE_URL, {
+  const response = await fetch(BASE_URL, {
     method: "GET",
     headers: getAuthHeaders(token),
   });
@@ -23,7 +24,7 @@ export async function getStocks(token: string): Promise<Stock[]> {
 }
 
 export async function getStockById(id: number,token: string): Promise<Stock> {
-  const response = await fetch(`${API_BASE_URL}/${id}`, {
+  const response = await fetch(`${BASE_URL}/${id}`, {
     method: "GET",
     headers: getAuthHeaders(token),
   });
@@ -40,7 +41,7 @@ export async function getStockById(id: number,token: string): Promise<Stock> {
 }
 
 export async function createStock(dto: CreateStockDto,token: string): Promise<Stock> {
-  const response = await fetch(API_BASE_URL, {
+  const response = await fetch(BASE_URL, {
     method: "POST",
     headers: getAuthHeaders(token),
     body: JSON.stringify(dto),
@@ -54,7 +55,7 @@ export async function createStock(dto: CreateStockDto,token: string): Promise<St
 }
 
 export async function deleteStock(id: number,token: string): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/${id}`, {
+  const response = await fetch(`${BASE_URL}/${id}`, {
     method: "DELETE",
     headers: getAuthHeaders(token),
   });

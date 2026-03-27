@@ -1,6 +1,7 @@
+import { ENV } from "../common/env";
 import type { CreateTradeRequest, Trade, UpdateTradeRequest } from "../types/trade";
 
-const BASE_URL = "http://localhost:3001/api/trade";
+const BASE_URL = `${ENV.BASE_URL}/trade`;
 
 export async function getTrades(): Promise<Trade[]> {
   const response = await fetch(BASE_URL);

@@ -1,6 +1,8 @@
 import type { AuthResponse, LoginRequest, RegisterRequest } from "../types/auth";
+import { ENV } from "../common/env";
 
-const BASE_URL = "http://localhost:3001/api/auth";
+const BASE_URL = `${ENV.BASE_URL}/auth`;
+
 
 export async function login(data: LoginRequest): Promise<AuthResponse> {
   const response = await fetch(`${BASE_URL}/login`, {
