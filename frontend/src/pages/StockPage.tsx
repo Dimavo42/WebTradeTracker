@@ -1,43 +1,23 @@
-import { useCallback, useEffect, useState } from "react";
-import { getStocks } from "../api/stocksApi";
-import type { Stock } from "../types/stock";
 import { useAppSelector } from "../hooks/reduxHooks";
+import { useStocks } from "../hooks/useStocks";
+import ErrorMessage from "../components/common/ErrorMessage";
 import styles from "./StockPage.module.css";
 
 export default function StockPage() {
-  const [stocks, setStocks] = useState<Stock[]>([]);
-  const [loading, setLoading] = useState(false);
   const token = useAppSelector((state) => state.auth.token);
+  const { stocks, loading, error } = useStocks(token);
 
-  const fetchStocks = useCallback(async () => {
-    if (!token) {
-      setStocks([]);
-      return;
-    }
-    try {
-      setLoading(true);
-      if (token) {
-        const response = await getStocks(token);
-        setStocks(response);
-      }
-    } catch (err) {
-      console.error("Failed to load stocks", err);
-    } finally {
-      setLoading(false);
-    }
-  }, [token]);
-
-  useEffect(() => {
-    fetchStocks();
-  }, [fetchStocks]);
-
-  if (loading) return <p>Loading stocks...</p>;
+  if (loading) {
+    return <p>Loading stocks...</p>;
+  }
 
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>📈 Stocks</h2>
 
-      {stocks.length === 0 ? (
+      {error && <ErrorMessage message={error} />}
+
+      {!error && stocks.length === 0 ? (
         <p className={styles.message}>No stocks found</p>
       ) : (
         <div className={styles.grid}>
@@ -56,6 +36,7 @@ export default function StockPage() {
               <p>
                 <strong>Sector:</strong> {stock.sector ?? "N/A"}
               </p>
+
               <p>
                 <strong>Created At:</strong>{" "}
                 {new Date(stock.createdAt).toLocaleString()}
