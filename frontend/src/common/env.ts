@@ -1,10 +1,5 @@
-import dotenv from 'dotenv';
-
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-dotenv.config();
-
-function getEnv(key: string): string {
-  const value = process.env[key];
+function getEnv(key: keyof ImportMetaEnv): string {
+  const value = import.meta.env[key];
 
   if (!value) {
     throw new Error(`Missing environment variable: ${key}`);
@@ -14,5 +9,5 @@ function getEnv(key: string): string {
 }
 
 export const ENV = {
-  BASE_URL: getEnv('BASE_URL'),
+  BASE_URL: getEnv("VITE_BASE_URL"),
 };

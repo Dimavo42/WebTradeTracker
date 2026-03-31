@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login as loginApi } from "../api/authApi";
 import { useAppDispatch } from "../hooks/reduxHooks";
 import styles from "../styles/auth.module.css";
 import { login as loginAction } from "../features/auth/authSlice";
 import ErrorMessage from "../components/common/ErrorMessage";
+import { useAuth } from "../hooks/useAuth";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -12,22 +12,18 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { login, loading, error } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
 
     try {
-      const response = await loginApi({ email, password });
+      const response = await login({ email, password });
       dispatch(loginAction(response.token));
       navigate("/");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
-    } finally {
-      setIsLoading(false);
+      // Error is handled in useLogin hook, no need to do anything here
     }
   };
 
@@ -54,8 +50,8 @@ export default function LoginPage() {
         required
       />
 
-      <button type="submit" disabled={isLoading}>
-        {isLoading ? "Logging in..." : "Login"}
+      <button type="submit" disabled={loading}>
+        {loading ? "Logging in..." : "Login"}
       </button>
 
       <p>
@@ -64,4 +60,4 @@ export default function LoginPage() {
     </form>
   </div>
 );
-}
+} ;
