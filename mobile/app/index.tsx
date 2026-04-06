@@ -1,18 +1,20 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Button,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
-  TextInput,
   View,
-  Text,
 } from 'react-native';
 
 import { createStock, getStocks, login } from '@/api';
 import type { StockDto } from '@/api';
+import { Header } from '@/components/Header';
+import { StatusDisplay } from '@/components/StatusDisplay';
+import { LoginForm } from '@/components/LoginForm';
+import { LogoutBar } from '@/components/LogoutBar';
+import { CreateStockForm } from '@/components/CreateStockForm';
+import { StockList } from '@/components/StockList';
 
 const initialStockForm = {
   symbol: '',
@@ -120,22 +122,6 @@ export default function HomeScreen() {
     setError(null);
   };
 
-  const statusText = useMemo(() => {
-    if (loading) {
-      return 'Loading...';
-    }
-
-    if (error) {
-      return `Error: ${error}`;
-    }
-
-    if (isLoggedIn) {
-      return `Logged in as ${email}`;
-    }
-
-    return 'Enter your credentials to log in';
-  }, [email, error, isLoggedIn, loading]);
-
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView
@@ -143,91 +129,44 @@ export default function HomeScreen() {
         style={styles.flex}
       >
         <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>
-            Muilem BFF
-          </Text>
+          <Header title="Muilem BFF" />
 
-          <Text style={styles.status}>
-            {statusText}
-          </Text>
+          <StatusDisplay
+            loading={loading}
+            error={error}
+            isLoggedIn={isLoggedIn}
+            email={email}
+          />
 
           {!isLoggedIn ? (
-            <View style={styles.form}>
-              <Text style={styles.label}>
-                Email
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={email}
-                onChangeText={setEmail}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                placeholder="you@example.com"
-                placeholderTextColor="#888"
-              />
-
-              <Text style={styles.label}>
-                Password
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                placeholder="••••••••"
-                placeholderTextColor="#888"
-              />
-
-              <Button title="Log in" onPress={handleLogin} disabled={loading || !email || !password} />
-            </View>
+            <LoginForm
+              email={email}
+              password={password}
+              loading={loading}
+              onEmailChange={setEmail}
+              onPasswordChange={setPassword}
+              onLogin={handleLogin}
+            />
           ) : (
-            <View style={styles.form}>
-              <View style={styles.row}>
-                <Button title="Refresh stocks" onPress={refreshStocks} />
-                <Button title="Log out" onPress={handleLogout} color="#d9534f" />
-              </View>
+            <>
+              <LogoutBar onRefresh={refreshStocks} onLogout={handleLogout} />
 
-              <Text style={styles.sectionTitle}>
-                Add a stock
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={stockForm.symbol}
-                onChangeText={(value) => setStockForm((prev) => ({ ...prev, symbol: value }))}
-                placeholder="Symbol"
-                placeholderTextColor="#888"
+              <CreateStockForm
+                symbol={stockForm.symbol}
+                companyName={stockForm.companyName}
+                loading={loading}
+                onSymbolChange={(value) =>
+                  setStockForm((prev) => ({ ...prev, symbol: value }))
+                }
+                onCompanyNameChange={(value) =>
+                  setStockForm((prev) => ({ ...prev, companyName: value }))
+                }
+                onCreate={handleCreateStock}
               />
-              <TextInput
-                style={styles.input}
-                value={stockForm.companyName}
-                onChangeText={(value) => setStockForm((prev) => ({ ...prev, companyName: value }))}
-                placeholder="Company name"
-                placeholderTextColor="#888"
-              />
-              <Button title="Create stock" onPress={handleCreateStock} disabled={loading} />
-            </View>
+            </>
           )}
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              Stocks
-            </Text>
-            {loading && <ActivityIndicator size="small" color="#0a7ea4" />}
-            {stocks.length === 0 && !loading ? (
-              <Text>No stocks available yet.</Text>
-            ) : (
-              stocks.map((stock) => (
-                <View key={stock.id} style={styles.stockCard}>
-                  <View style={styles.stockHeader}>
-                    <Text style={styles.bold}>{stock.symbol}</Text>
-                    <Text>{stock.exchange ?? 'N/A'}</Text>
-                  </View>
-                  <Text>{stock.companyName}</Text>
-                  <Text style={styles.stockMeta}>Created {new Date(stock.createdAt).toLocaleDateString()}</Text>
-                </View>
-              ))
-            )}
-          </View>
+          <StockList stocks={stocks} loading={loading} />
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -244,64 +183,5 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     gap: 18,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  status: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  form: {
-    gap: 12,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 6,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#999',
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-    color: '#000',
-    backgroundColor: '#fff',
-  },
-  section: {
-    gap: 12,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 6,
-  },
-  stockCard: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 16,
-    padding: 14,
-    backgroundColor: '#f8fbff',
-    gap: 6,
-  },
-  stockHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  stockMeta: {
-    fontSize: 12,
-    color: '#444',
-  },
-  bold: {
-    fontWeight: '600',
   },
 });
