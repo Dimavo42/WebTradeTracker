@@ -13,9 +13,14 @@ function getEnv(key: string): string {
   return value;
 }
 
+function getOptionalEnv(key: string, defaultValue: string): string {
+  return process.env[key] ?? defaultValue;
+}
+
 export const ENV = {
   DOTNET_API_URL: getEnv('DOTNET_API_URL'),
   PORT: Number(getEnv('PORT')),
   FRONT_URL_1: getEnv('FRONT_URL_1'),
   FRONT_URL_2: getEnv('FRONT_URL_2'),
+  MOBILE_ORIGIN: getOptionalEnv('MOBILE_ORIGIN', '*'),
 };

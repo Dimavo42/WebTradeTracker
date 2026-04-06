@@ -1,6 +1,8 @@
 import { Platform } from 'react-native';
-const LOCAL_BFF_HOST = 'localhost:3001';
-const ANDROID_EMULATOR_HOST = '10.0.2.2:3001';
+
+const LOCAL_BFF_HOST = 'localhost:3000';
+const ANDROID_EMULATOR_HOST = '10.0.2.2:3000';
+
 const host = Platform.OS === 'android' ? ANDROID_EMULATOR_HOST : LOCAL_BFF_HOST;
 export const API_BASE_URL = `http://${host}/api`;
 
