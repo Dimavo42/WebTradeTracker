@@ -46,7 +46,7 @@ export default function HomeScreen() {
     setLoading(true);
     getStocks(token)
       .then(setStocks)
-      .catch((err) => {
+      .catch((err: unknown) => {
         setError(getErrorMessage(err, 'Failed to load stocks'));
       })
       .finally(() => setLoading(false));
