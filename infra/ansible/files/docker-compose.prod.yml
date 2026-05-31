@@ -1,0 +1,65 @@
+services:
+  frontend:
+    image: ${DOCKER_USERNAME}/webtrade-frontend:${IMAGE_TAG}
+    container_name: trade_frontend
+    ports:
+       - "3000:80"
+    depends_on:
+      - bff
+    networks:
+      - trade_network
+
+  bff:
+    image: ${DOCKER_USERNAME}/webtrade-bff:${IMAGE_TAG}
+    container_name: trade_bff
+    ports:
+    - "3001:3000"
+    environment:
+      DOTNET_API_URL: http://backend:8080
+      JWT_KEY: ${JWT_KEY}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+    depends_on:
+      - backend
+    networks:
+      - trade_network
+
+  backend:
+    restart: always
+    image: ${DOCKER_USERNAME}/webtrade-api:${IMAGE_TAG}
+    container_name: trade_backend
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Sql: "Server=db;Database=TradeDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;"
+      Jwt__Key: ${JWT_KEY}
+      Jwt__Issuer: ${JWT_ISSUER}
+      Jwt__Audience: ${JWT_AUDIENCE}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - trade_network
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: trade_sql
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: ${SA_PASSWORD}
+    volumes:
+      - sql_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "timeout 1 bash -c '</dev/tcp/localhost/1433' || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 20
+    networks:
+      - trade_network
+
+volumes:
+  sql_data:
+
+networks:
+  trade_network:

@@ -1,0 +1,32 @@
+- hosts: webtrade
+  become: yes
+
+  tasks:
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker.io
+        update_cache: yes
+        state: present
+
+    - name: Ensure app folder exists
+      file:
+        path: /opt/webtrade
+        state: directory
+        mode: '0755'
+
+    - name: Copy docker compose file
+      copy:
+        src: files/docker-compose.prod.yml
+        dest: /opt/webtrade/docker-compose.prod.yml
+
+    - name: Copy env file
+      copy:
+        src: files/.env
+        dest: /opt/webtrade/.env
+
+    - name: Start app
+      shell: docker compose -f docker-compose.prod.yml up -d
+      args:
+        chdir: /opt/webtrade
