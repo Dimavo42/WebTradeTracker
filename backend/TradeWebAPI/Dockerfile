@@ -1,19 +1,17 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-WORKDIR /app
-EXPOSE 8080
-
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 
-COPY ["backend/TradeWebAPI/TradeWebAPI.csproj", "backend/TradeWebAPI/"]
-RUN dotnet restore "backend/TradeWebAPI/TradeWebAPI.csproj"
+COPY backend/TradeWebAPI/TradeWebAPI.csproj backend/TradeWebAPI/
+RUN dotnet restore backend/TradeWebAPI/TradeWebAPI.csproj
 
 COPY . .
-WORKDIR "/src/backend/TradeWebAPI"
-RUN dotnet publish "TradeWebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish backend/TradeWebAPI/TradeWebAPI.csproj \
+    -c Release -o /app/publish --no-restore
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
+
 COPY --from=build /app/publish .
+
+EXPOSE 8080
 ENTRYPOINT ["dotnet", "TradeWebAPI.dll"]
