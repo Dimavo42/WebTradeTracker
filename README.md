@@ -2,7 +2,6 @@
 
 A trading journal app: browse live stock prices, pick stocks to follow, log your trades, and view 5-year price charts.
 
-<img width="1265" height="619" alt="image" src="https://github.com/user-attachments/assets/db083f42-b793-4160-969f-819f72c59b59" />
 
 ## Tech Stack
 
