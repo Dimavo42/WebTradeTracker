@@ -12,3 +12,11 @@
   margin: 0 0 24px;
   font-size: 28px;
 }
+.sectionTitle {
+  margin: 32px 0 12px;
+  font-size: 20px;
+}
+
+.emptyMessage {
+  color: #6b7280;
+}

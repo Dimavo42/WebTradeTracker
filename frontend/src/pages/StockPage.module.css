@@ -17,26 +17,109 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
 .card {
+  display: flex;
+  flex-direction: column;
+  min-height: 250px;
   background: #ffffff;
   border-radius: 12px;
   padding: 18px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
   border: 1px solid #eaeaea;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.card:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+}
+
+.card:focus-visible {
+  outline: 2px solid #2e7df6;
+  outline-offset: 2px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
 .symbol {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: 22px;
   color: #2f80ed;
 }
 
-.card p {
-  margin: 8px 0;
+.badges {
+  display: flex;
+  gap: 6px;
+}
+
+.badgeJournal,
+.badgeSelected {
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badgeJournal {
+  background: #dcfce7;
+  color: #1a7f37;
+}
+
+.badgeSelected {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.cardBody p {
+  margin: 6px 0;
+}
+
+.name {
   color: #333;
+  font-size: 15px;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+}
+
+.up {
+  color: #1a7f37;
   font-size: 14px;
+}
+
+.down {
+  color: #cf222e;
+  font-size: 14px;
+}
+
+.error {
+  color: #cf222e;
+  font-size: 14px;
+}
+
+.hint {
+  margin-top: auto !important;
+  padding-top: 8px;
+  font-size: 13px;
+  color: #6b7280;
 }

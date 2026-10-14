@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import { useAppSelector, useAppDispatch } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
+import { setTradesStocks } from "../../features/userStocks";
 
 type NavbarProps = {
   title?: string;
@@ -17,6 +18,7 @@ export default function Navbar({ title = "Trade Tracker" }: NavbarProps) {
 
   const handleLogout = () => {
     dispatch(logout());
+    dispatch(setTradesStocks([]));
     navigate("/");
   };
 

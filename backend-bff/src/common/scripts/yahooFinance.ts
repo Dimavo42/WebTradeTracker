@@ -1,5 +1,8 @@
 import YahooFinance from 'yahoo-finance2';
-import { MarketStockDto } from '../../market/dto/marketStock.dto';
+import {
+  MarketStockDto,
+  PricePointDto,
+} from '../../market/dto/marketStock.dto';
 
 const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] });
 
@@ -91,4 +94,23 @@ export async function fetchDefaultStocks(): Promise<MarketStockDto[]> {
   cache = { data, fetchedAt: Date.now() };
 
   return data;
+}
+
+const HISTORY_YEARS = 5;
+
+export async function fetchHistory(symbol: string): Promise<PricePointDto[]> {
+  const period1 = new Date();
+  period1.setFullYear(period1.getFullYear() - HISTORY_YEARS);
+
+  const result = await yahooFinance.chart(symbol, {
+    period1,
+    interval: '1wk',
+  });
+
+  return result.quotes
+    .filter((q) => q.close !== null)
+    .map((q) => ({
+      date: q.date.toISOString(),
+      close: q.close as number,
+    }));
 }

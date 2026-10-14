@@ -1,14 +1,13 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { TradesModule } from './trades/trades.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
-import { StocksModule } from './stocks/stocks.module';
+import { JournalModule } from './journal/journal.module';
 import { MarketModule } from './market/market.module';
 import { TimingInterceptor } from './common/interceptors/timing.interceptor';
 import { RequestLoggerMiddleware } from './common/middleware/requestLogger.middleware';
 
 @Module({
-  imports: [TradesModule, AuthModule, StocksModule, MarketModule],
+  imports: [AuthModule, JournalModule, MarketModule],
   providers: [
     {
       provide: APP_INTERCEPTOR,

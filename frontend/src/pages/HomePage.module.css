@@ -34,3 +34,19 @@
 .negative {
   color: #cf222e;
 }
+
+.journalCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.inJournal {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #1a7f37;
+  font-size: 13px;
+  font-weight: 600;
+}

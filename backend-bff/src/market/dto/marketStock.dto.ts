@@ -8,3 +8,8 @@ export interface MarketStockDto {
   changePercent: number | null;
   marketCap: number | null;
 }
+
+export interface PricePointDto {
+  date: string;
+  close: number;
+}

@@ -44,3 +44,8 @@
   outline: none;
   border-color: #2e7df6;
 }
+.emptyRow {
+  text-align: center !important;
+  color: #6b7280;
+  padding: 24px !important;
+}

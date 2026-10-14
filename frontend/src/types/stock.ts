@@ -1,12 +1,3 @@
-export type Stock = {
-  id: number;
-  symbol: string;
-  companyName: string;
-  exchange: string | null;
-  sector: string | null;
-  createdAt: string;
-};
-
 export type MarketStock = {
   symbol: string;
   companyName: string;
@@ -18,7 +9,7 @@ export type MarketStock = {
   marketCap: number | null;
 };
 
-export type CreateStockDto = {
-  symbol: string;
-  companyName: string;
+export type PricePoint = {
+  date: string;
+  close: number;
 };
