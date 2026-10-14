@@ -5,6 +5,7 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import StockPage from "../pages/StockPage";
 import NotFoundPage from "../pages/NotFoundPage";
+import HomePage from "../pages/HomePage";
 
 
 export default function AppRouter() {
@@ -12,7 +13,8 @@ export default function AppRouter() {
     <BrowserRouter>
       <Navbar />
       <Routes>
-        <Route path="/" element={<TradesPage />} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/trades" element={<TradesPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/stocks" element={<StockPage />} />

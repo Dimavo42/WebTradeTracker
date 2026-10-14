@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import { useAppSelector, useAppDispatch } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
@@ -20,6 +20,9 @@ export default function Navbar({ title = "Trade Tracker" }: NavbarProps) {
     navigate("/");
   };
 
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    isActive ? `${styles.link} ${styles.active}` : styles.link;
+
   return (
     <header className={styles.navbar}>
       <div className={styles.brand}>
@@ -28,14 +31,26 @@ export default function Navbar({ title = "Trade Tracker" }: NavbarProps) {
       </div>
 
       <nav className={styles.links}>
-        <Link to="/">Trades</Link>
-        {isAuthenticated && <Link to="/stocks">Stocks</Link>}
+        <NavLink to="/" end className={linkClass}>
+          Home
+        </NavLink>
+
         {isAuthenticated ? (
-          <button onClick={handleLogout} className={styles.logoutBtn}>
-            Logout
-          </button>
+          <>
+            <NavLink to="/stocks" className={linkClass}>
+              Stocks
+            </NavLink>
+            <NavLink to="/trades" className={linkClass}>
+              Trades Journal
+            </NavLink>
+            <button onClick={handleLogout} className={styles.logoutBtn}>
+              Logout
+            </button>
+          </>
         ) : (
-          <Link to="/login">Login</Link>
+          <NavLink to="/login" className={linkClass}>
+            Login
+          </NavLink>
         )}
       </nav>
     </header>

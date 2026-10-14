@@ -8,6 +8,7 @@ import styles from "./TradesPage.module.css";
 import { useTrades } from "../hooks/useTrades";
 
 export default function TradesPage() {
+  
   const { trades, loading, error, addTrade, deleteTrade, updateTrade } = useTrades();
 
   const [editingTradeId, setEditingTradeId] = useState<number | null>(null);

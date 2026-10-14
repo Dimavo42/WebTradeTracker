@@ -3,11 +3,12 @@ import { TradesModule } from './trades/trades.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module';
 import { StocksModule } from './stocks/stocks.module';
+import { MarketModule } from './market/market.module';
 import { TimingInterceptor } from './common/interceptors/timing.interceptor';
 import { RequestLoggerMiddleware } from './common/middleware/requestLogger.middleware';
 
 @Module({
-  imports: [TradesModule, AuthModule, StocksModule],
+  imports: [TradesModule, AuthModule, StocksModule, MarketModule],
   providers: [
     {
       provide: APP_INTERCEPTOR,

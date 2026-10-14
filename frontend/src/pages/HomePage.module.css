@@ -1,0 +1,36 @@
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 24px;
+}
+
+.table {
+  width: 100%;
+  min-width: 700px;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.table th,
+.table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5e5e5;
+  text-align: left;
+}
+
+.table th {
+  background: #f1f3f5;
+  font-weight: 600;
+}
+
+.symbol {
+  font-weight: 600;
+}
+
+.positive {
+  color: #1a7f37;
+}
+
+.negative {
+  color: #cf222e;
+}

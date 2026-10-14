@@ -8,9 +8,6 @@ services:
     container_name: trade_frontend
     ports:
       - "3000:80"
-    volumes:
-    - ./frontend:/app
-    - /app/node_modules
     depends_on:
       - backend
     networks:
@@ -34,6 +31,7 @@ services:
       context: .
       dockerfile: backend/TradeWebAPI/Dockerfile
     container_name: trade_backend
+    restart: on-failure
     ports:
       - "5000:8080"
     depends_on:
