@@ -7,12 +7,13 @@ import StockPage from "../pages/StockPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import HomePage from "../pages/HomePage";
 import Chatbot from "../components/chatbot/Chatbot";
-
+import styles from "../styles/main.module.css";
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Navbar />
+      <main className={styles.pageContent} >
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/trades" element={<TradesPage />} />
@@ -21,8 +22,8 @@ export default function AppRouter() {
         <Route path="/stocks" element={<StockPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      </main>
       <Chatbot />
-
     </BrowserRouter>
   );
 }
