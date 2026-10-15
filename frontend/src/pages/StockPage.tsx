@@ -1,6 +1,6 @@
 import { useAppSelector } from "../hooks/reduxHooks";
 import { useTrades } from "../hooks/useTrades";
-import { useMarketStocks } from "../hooks/useMarketStocks";
+import { useQuotes } from "../hooks/useQuotes";
 import ErrorMessage from "../components/common/ErrorMessage";
 import StockCard from "../components/stock/StockCard";
 import styles from "./StockPage.module.css";
@@ -9,7 +9,6 @@ export default function StockPage() {
   const token = useAppSelector((state) => state.auth.token);
   const userStocks = useAppSelector((state) => state.userTradeStocks);
   const { trades, loading, error } = useTrades(token);
-  const { stocks: marketStocks } = useMarketStocks();
 
   const symbols = [
     ...new Set([
@@ -18,7 +17,8 @@ export default function StockPage() {
     ]),
   ].sort();
 
-  const marketBySymbol = new Map(marketStocks.map((s) => [s.symbol, s]));
+  const quotes = useQuotes(symbols);
+  const marketBySymbol = new Map(quotes.map((s) => [s.symbol, s]));
 
   if (loading) {
     return <p className={styles.message}>Loading stocks...</p>;

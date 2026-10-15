@@ -37,7 +37,7 @@ A Backend-for-Frontend that sits between the clients and the .NET API:
 
 - **`auth`** – proxies login/register to the .NET API
 - **`journal`** – trades and stocks in one module, protected by a JWT guard (Passport) that verifies the .NET-issued token
-- **`market`** – live quotes for 50 popular stocks and 5-year weekly price history from Yahoo Finance, with a short in-memory cache
+- **`market`** – a Yahoo Finance screener for the top stocks, ETFs and bond ETFs in 8 countries (filter by sector, search by name or ticker, choose how many results), plus live quotes and 5-year weekly price history, with a short in-memory cache and validated query DTOs
 - Request logging middleware, a response-timing interceptor and CORS for the web and mobile clients
 
 ## Run
