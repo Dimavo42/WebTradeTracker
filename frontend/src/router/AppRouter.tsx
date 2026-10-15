@@ -6,6 +6,7 @@ import RegisterPage from "../pages/RegisterPage";
 import StockPage from "../pages/StockPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import HomePage from "../pages/HomePage";
+import Chatbot from "../components/chatbot/Chatbot";
 
 
 export default function AppRouter() {
@@ -20,6 +21,7 @@ export default function AppRouter() {
         <Route path="/stocks" element={<StockPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <Chatbot />
 
     </BrowserRouter>
   );

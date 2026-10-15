@@ -1,4 +1,6 @@
 .navbar {
+  top: 0;
+  position: fixed;
   width: 100%;
   min-height: 70px;
   padding: 0 24px;
@@ -9,12 +11,18 @@
   color: white;
   border-bottom: 1px solid #1f2937;
   box-sizing: border-box;
+
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.brand:hover {
+  cursor: pointer;
+  opacity: 0.8;
 }
 
 .logo {

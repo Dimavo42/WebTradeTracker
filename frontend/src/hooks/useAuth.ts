@@ -1,13 +1,26 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { login as loginApi, register as registerApi } from "../api/authApi";
 import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
 } from "../types/auth";
+import { useNavigate } from "react-router-dom";
 
 function getErrorMessage(err: unknown, fallback: string): string {
   return err instanceof Error ? err.message : fallback;
+}
+
+
+function getExpiredTokenTime(token:string):number{
+  const payload  = token.split('.')[1];
+  const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+  const decoded = atob(base64);
+  const { exp } = JSON.parse(decoded);
+   if (typeof exp !== "number") {
+    throw new Error("Token has no expiration");
+  }
+  return exp * 1000; // Convert to milliseconds
 }
 
 export function useAuth() {
@@ -44,6 +57,7 @@ export function useAuth() {
     }
   };
 
+
   return {
     login,
     register,
@@ -51,4 +65,56 @@ export function useAuth() {
     error,
     clearError: () => setError(null),
   };
+}
+
+
+// Browser timers have a maximum supported delay (~24.8 days).
+const MAX_TIMEOUT_MS = 2_147_483_647;
+
+// Call once, inside the router: when the token expires (or can't be read),
+// runs onExpire and returns to Home.
+export function useAuthExpiration(token: string | null, onExpire: () => void) {
+  const navigate = useNavigate();
+
+  // Keep the latest callback without restarting the timer on every render
+  // when the caller passes an inline function.
+  const onExpireRef = useRef(onExpire);
+  useEffect(() => {
+    onExpireRef.current = onExpire;
+  }, [onExpire]);
+
+  useEffect(() => {
+    if (!token) return;
+
+    const expireSession = () => {
+      onExpireRef.current();
+      navigate("/", { replace: true });
+    };
+
+    let expirationTime: number;
+    try {
+      expirationTime = getExpiredTokenTime(token);
+    } catch {
+      expireSession();
+      return;
+    }
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const checkExpiration = () => {
+      const remaining = expirationTime - Date.now();
+
+      if (remaining <= 0) {
+        expireSession();
+        return;
+      }
+
+      timer = setTimeout(checkExpiration, Math.min(remaining, MAX_TIMEOUT_MS));
+    };
+
+    checkExpiration();
+
+    // Cancel the old timer on logout / new token, so it can't end the next session.
+    return () => clearTimeout(timer);
+  }, [token, navigate]);
 }

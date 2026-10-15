@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import { logout } from "./auth/authSlice";
 
 export type userTradeStocks = {
   id: string;
@@ -26,9 +27,14 @@ const userTradeStocksSlice = createSlice({
       const index = state.findIndex(stock => stock.id === action.payload.id);
       if (index !== -1) {
         state[index] = action.payload;
-      }   
+      }
   },
-}});
+  },
+  // Any logout (button or expired token) clears the selected stocks.
+  extraReducers: (builder) => {
+    builder.addCase(logout, () => []);
+  },
+});
 
 
 export const { setTradesStocks, addUserTradeStock, removeTradeStock, updateTradeStock} = userTradeStocksSlice.actions;

@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import styles from "./Navbar.module.css";
 import { useAppSelector, useAppDispatch } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
-import { setTradesStocks } from "../../features/userStocks";
+import { useAuthExpiration } from "../../hooks/useAuth";
 
 type NavbarProps = {
   title?: string;
@@ -15,20 +15,28 @@ export default function Navbar({ title = "Trade Tracker" }: NavbarProps) {
   const isAuthenticated = useAppSelector(
     (state) => state.auth.isAuthenticated
   );
+  const token = useAppSelector((state) => state.auth.token);
 
+  // Navbar is on every page, so the session is watched in one place.
+  // logout also clears the selected stocks (see userStocks slice), and
+  // pages using useTrades(token) drop their trades when the token is gone.
   const handleLogout = () => {
     dispatch(logout());
-    dispatch(setTradesStocks([]));
     navigate("/");
   };
+  useAuthExpiration(token, () => handleLogout());
+
+  
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive ? `${styles.link} ${styles.active}` : styles.link;
 
   return (
     <header className={styles.navbar}>
-      <div className={styles.brand}>
-        <span className={styles.logo}>📈</span>
+      <div className={styles.brand} onClick={() => navigate("/")}>
+        <span className={styles.logo} >
+          📈
+        </span>
         <h1>{title}</h1>
       </div>
 
