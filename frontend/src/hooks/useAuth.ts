@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { login as loginApi, register as registerApi } from "../api/authApi";
 import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
 } from "../types/auth";
-import { useNavigate } from "react-router-dom";
 
 function getErrorMessage(err: unknown, fallback: string): string {
   return err instanceof Error ? err.message : fallback;
@@ -68,53 +67,33 @@ export function useAuth() {
 }
 
 
-// Browser timers have a maximum supported delay (~24.8 days).
-const MAX_TIMEOUT_MS = 2_147_483_647;
-
-// Call once, inside the router: when the token expires (or can't be read),
-// runs onExpire and returns to Home.
 export function useAuthExpiration(token: string | null, onExpire: () => void) {
-  const navigate = useNavigate();
 
-  // Keep the latest callback without restarting the timer on every render
-  // when the caller passes an inline function.
-  const onExpireRef = useRef(onExpire);
-  useEffect(() => {
-    onExpireRef.current = onExpire;
-  }, [onExpire]);
-
-  useEffect(() => {
-    if (!token) return;
-
-    const expireSession = () => {
-      onExpireRef.current();
-      navigate("/", { replace: true });
-    };
-
-    let expirationTime: number;
-    try {
+  useEffect(()=>{
+    if(!token) return;
+    let expirationTime:number;
+    try{
       expirationTime = getExpiredTokenTime(token);
-    } catch {
-      expireSession();
+    }catch{
+      onExpire();
       return;
     }
-
-    let timer: ReturnType<typeof setTimeout> | undefined;
-
+    let timer: ReturnType<typeof setTimeout>;
     const checkExpiration = () => {
       const remaining = expirationTime - Date.now();
-
       if (remaining <= 0) {
-        expireSession();
+        onExpire();
         return;
       }
-
-      timer = setTimeout(checkExpiration, Math.min(remaining, MAX_TIMEOUT_MS));
+      // Browser timers have a maximum supported delay.
+      timer = setTimeout(checkExpiration, Math.min(remaining, 2_147_483_647));
     };
-
     checkExpiration();
+    return () =>clearTimeout(timer);
 
-    // Cancel the old timer on logout / new token, so it can't end the next session.
-    return () => clearTimeout(timer);
-  }, [token, navigate]);
+  },[token,onExpire]);
+
+
+
+  
 }
