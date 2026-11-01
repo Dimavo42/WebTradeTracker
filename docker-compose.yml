@@ -17,9 +17,14 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server kafka:29092 > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 15s
     networks:
-      - trade_network
-      
+      - trade_network  
   frontend:
     build:
       context: ./frontend
@@ -42,9 +47,13 @@ services:
       - backend
     environment:
       DOTNET_API_URL: http://backend:8080
+      PORT : "3000"
+      FRONT_URL_1 : "http://frontend:3000"
+      FRONT_URL_2 : "http://localhost:5173"
+      MOBILE_ORIGIN: "*"
     networks:
       - trade_network
-
+      
   backend:
     build:
       context: .
@@ -54,8 +63,10 @@ services:
     ports:
       - "5000:8080"
     depends_on:
-      - db
-      - kafka
+      db:
+        condition: service_started
+      kafka:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       Kafka__BootstrapServers: "kafka:29092"
@@ -76,8 +87,33 @@ services:
     networks:
       - trade_network
 
+  audit:
+    build:
+      context: ./audit
+      dockerfile: Dockerfile
+    container_name: trade_audit
+    restart: on-failure
+    environment:
+      PORT : "3002"
+      KAFKA_BROKERS: "kafka:29092"
+      KAFKA_GROUP_ID: "trade-audit"
+      AUDIT_DB_PATH: /data
+    volumes:
+      - audit_data:/data
+    ports:
+      - "3002:3002"
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+     - trade_network
+
+
 volumes:
   sql_data:
+  audit_data:
+  
+   
 
 networks:
   trade_network:

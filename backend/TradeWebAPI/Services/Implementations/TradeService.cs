@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using System.Collections.Generic;
+using Confluent.Kafka;
 using TradeWebAPI.Common;
 using TradeWebAPI.DTOs;
 using TradeWebAPI.Entities;
@@ -30,7 +30,6 @@ namespace TradeWebAPI.Services.Implementations
             _tradeValidator = tradeValidator;
             _tradeProducer = tradeProducer;
         }
-
 
         public async Task<ServiceResult<Trade>> UpdateTradeAsync(int id, UpdateTradeDto dto)
         {
@@ -117,7 +116,15 @@ namespace TradeWebAPI.Services.Implementations
             await _unitOfWork.Trades.AddAsync(trade);
             await _unitOfWork.CompleteAsync();
             _logger.LogInformation("TradeService.CreateTradeAsync completed successfully.");
-            await _tradeProducer.PublishTrade(trade);
+            try
+            {
+                await _tradeProducer.PublishTrade(trade);
+            }
+            catch (ProduceException<string, string> ex)
+            {
+                // The trade is already saved; a missing audit event must not fail the request
+                _logger.LogError(ex, "Failed to publish audit event. TradeId: {TradeId}", trade.Id);
+            }
             return ServiceResult<Trade>.Success(trade);
         }
 
@@ -148,7 +155,6 @@ namespace TradeWebAPI.Services.Implementations
             return  ServiceResult<bool>.Success(true);
         }
         
-
         public async Task<ServiceResult<TradeDto>> GetTradeByIdAsync(int id)
         {
             _logger.LogInformation("TradeService.GetTradeByIdAsync started. TradeId: {TradeId}", id);

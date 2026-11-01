@@ -9,8 +9,6 @@ namespace TradeWebAPI.Mappings
         public TradeProfile()
         {
             CreateMap<CreateTradeDto, Trade>();
-
-
             CreateMap<Trade, TradeDto>()
             .ForMember(dest => dest.Symbol,
         opt => opt.MapFrom(src => src.Stock.Symbol));

@@ -26,6 +26,8 @@ pnpm-debug.log*
 
 coverage/
 
+audit/node_modules/
+
 # -----------------------------
 # Environment variables
 # -----------------------------
