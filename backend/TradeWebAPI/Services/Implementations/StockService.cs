@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using TradeWebAPI.Common;
 using TradeWebAPI.DTOs;
 using TradeWebAPI.Entities;
+using TradeWebAPI.Enums;
 using TradeWebAPI.Repositories;
 using TradeWebAPI.Services.Interfaces;
 
@@ -22,30 +24,30 @@ namespace TradeWebAPI.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<StockDto>> GetStocksAsync()
+        public async Task<ServiceResult<IEnumerable<StockDto>>> GetStocksAsync()
         {
             _logger.LogInformation("StockService.GetStocksAsync started.");
             var stocks = await _unitOfWork.Stocks.GetAllAsync();
             var result = _mapper.Map<List<StockDto>>(stocks);
             _logger.LogInformation("StockService.GetStocksAsync completed. Count: {Count}", result.Count);
-            return result;
+            return ServiceResult<IEnumerable<StockDto>>.Success(result);
         }
 
-        public async Task<StockDto?> GetStockByIdAsync(int id)
+        public async Task<ServiceResult<StockDto>> GetStockByIdAsync(int id)
         {
             _logger.LogInformation("StockService.GetStockByIdAsync started. StockId: {StockId}", id);
             var stock = await _unitOfWork.Stocks.GetByIdAsync(id);
             if (stock == null)
             {
                 _logger.LogWarning("StockService.GetStockByIdAsync: Stock not found. StockId: {StockId}", id);
-                return null;
+                return ServiceResult<StockDto>.Failure(AppStatus.NotFound);
             }
             var result = _mapper.Map<StockDto>(stock);
             _logger.LogInformation("StockService.GetStockByIdAsync completed. StockId: {StockId}", id);
-            return result;
+            return ServiceResult<StockDto>.Success(result);
         }
 
-        public async Task<StockDto> CreateStockAsync(CreateStockDto dto)
+        public async Task<ServiceResult<StockDto>> CreateStockAsync(CreateStockDto dto)
         {
             _logger.LogInformation(
                 "StockService.CreateStockAsync started. Symbol: {Symbol}, CompanyName: {CompanyName}",
@@ -58,24 +60,23 @@ namespace TradeWebAPI.Services.Implementations
             _logger.LogInformation(
                 "StockService.CreateStockAsync completed. StockId: {StockId}, Symbol: {Symbol}",
                 stock.Id,
-                stock.Symbol);
-
-            return _mapper.Map<StockDto>(stock);
+                stock.Symbol);     
+            return ServiceResult<StockDto>.Success(_mapper.Map<StockDto>(stock));
         }
 
-        public async Task<bool> DeleteStockAsync(int id)
+        public async Task<ServiceResult<bool>> DeleteStockAsync(int id)
         {
             _logger.LogInformation("StockService.DeleteStockAsync started. StockId: {StockId}", id);
             var stock = await _unitOfWork.Stocks.GetByIdAsync(id);
             if (stock == null)
             {
                 _logger.LogWarning("StockService.DeleteStockAsync: Stock not found. StockId: {StockId}", id);
-                return false;
+                return ServiceResult<bool>.Failure(AppStatus.NotFound);
             }
             _unitOfWork.Stocks.Delete(stock);
             await _unitOfWork.CompleteAsync();
             _logger.LogInformation("StockService.DeleteStockAsync completed. StockId: {StockId}", id);
-            return true;
+            return ServiceResult<bool>.Success(true);
         }
     }
 }

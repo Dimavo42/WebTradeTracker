@@ -56,5 +56,11 @@ namespace TradeWebAPI.Repositories.Implementations
             return true;
         }
 
+        public async Task<Trade?> GetByStockSymbol(string symbol)
+        {
+            return await _context.Trades
+                .Include(t => t.Stock)
+                .FirstOrDefaultAsync(t => t.Stock.Symbol == symbol);
+        }
     }
 }

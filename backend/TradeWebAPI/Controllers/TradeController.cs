@@ -26,9 +26,9 @@ namespace TradeWebAPI.Controllers
         {
             var result = await _tradeService.UpdateTradeAsync(id, dto);
 
-            if (result != AppStatus.Success)
+            if (!result.IsSuccess)
             {
-                return result switch
+                return result.Status switch
                 {
                     AppStatus.NotFound => NotFound(),
                     AppStatus.InvalidRequest => BadRequest(),
@@ -46,8 +46,14 @@ namespace TradeWebAPI.Controllers
             try
             {
                 _logger.LogInformation("GetTrades started.");
-                var trades = await _tradeService.GetTradesAsync();
-                return Ok(trades);
+                var result = await _tradeService.GetTradesAsync();
+
+                if (!result.IsSuccess)
+                {
+                    return StatusCode(500, "An error occurred while processing your request.");
+                }
+
+                return Ok(result.Data);
             }
             catch (Exception ex)
             {
@@ -67,14 +73,14 @@ namespace TradeWebAPI.Controllers
 
                 var trade = await _tradeService.GetTradeByIdAsync(id);
 
-                if (trade == null)
+                if (!trade.IsSuccess)
                 {
                     _logger.LogWarning("GetTrade failed. Trade not found. TradeId: {TradeId}", id);
                     return NotFound();
                 }
 
                 _logger.LogInformation("GetTrade completed successfully. TradeId: {TradeId}", id);
-                return Ok(trade);
+                return Ok(trade.Data);
             }
             catch (Exception ex)
             {
@@ -96,9 +102,9 @@ namespace TradeWebAPI.Controllers
 
                 var result = await _tradeService.CreateTradeAsync(dto);
 
-                if (result != AppStatus.Success)
+                if (!result.IsSuccess)
                 {
-                    return result switch
+                    return result.Status switch
                     {
                         AppStatus.InvalidRequest => BadRequest("Invalid request."),
                         AppStatus.InvalidQuantity => BadRequest("Quantity must be greater than 0."),
@@ -133,7 +139,7 @@ namespace TradeWebAPI.Controllers
 
                 var deleted = await _tradeService.DeleteTradeAsync(symbol);
 
-                if (!deleted)
+                if (!deleted.IsSuccess)
                 {
                     _logger.LogWarning("DeleteTrade failed. Trade not found. symbol: {symbol}", symbol);
                     return NotFound();

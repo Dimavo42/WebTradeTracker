@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Confluent.Kafka;
 using System.Text;
 using TradeWebAPI.Mappings;
 using TradeWebAPI.Middleware;
@@ -70,6 +71,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("frontend", policy =>
@@ -79,9 +81,25 @@ builder.Services.AddCors(options =>
               .AllowAnyMethod();
     });
 });
+builder.Services.AddSingleton(services =>
+{
+    var configuration = services.GetRequiredService<IConfiguration>();
+
+    var config = new ProducerConfig
+    {
+        BootstrapServers = configuration["Kafka:BootstrapServers"]
+            ?? throw new InvalidOperationException(
+                "Kafka:BootstrapServers is missing"),
+
+        EnableIdempotence = true,
+        Acks = Acks.All
+    };
+
+    return new ProducerBuilder<string, string>(config).Build();
+});
+builder.Services.AddSingleton<ITradeProducer, TradeProducer>();
 
 var app = builder.Build();
-
 // Database migration
 using (var scope = app.Services.CreateScope())
 {

@@ -8,6 +8,8 @@ namespace TradeWebAPI.Repositories.Interfaces
 
         Task<Trade?> GetByIdAsync(int id);
 
+        Task<Trade?> GetByStockSymbol(string symbol);
+
         Task AddAsync(Trade trade);
 
         void Update(Trade trade);

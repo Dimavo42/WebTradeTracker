@@ -105,9 +105,7 @@ namespace TradeWebAPI.Services.Implementations
                 _logger.LogWarning("LoginAsync failed: invalid password for email: {Email}", normalizedEmail);
                 return ServiceResult<AuthResponseDto>.Failure(AppStatus.Unauthorized);
             }
-
             var token = _jwtTokenService.GenerateToken(user);
-
             var response = new AuthResponseDto
             {
                 Token = token,
@@ -117,7 +115,6 @@ namespace TradeWebAPI.Services.Implementations
             };
 
             _logger.LogInformation("LoginAsync succeeded. UserId: {UserId}, Email: {Email}", user.Id, user.Email);
-
             return ServiceResult<AuthResponseDto>.Success(response);
         }
     }

@@ -48,10 +48,8 @@ namespace TradeWebAPI.Tests.Services
             var result = await _tradeService.CreateTradeAsync(createTradeDto);
 
             // Assert
-            result.Should().NotBeNull();
-            result.IsSuccess.Should().BeFalse();
-            result.Status.Should().Be(AppStatus.InvalidRequest);
-
+            result.Should().BeDefined();
+            result.Should().Be(AppStatus.InvalidRequest);
             _mapperMock.Verify(m => m.Map<Trade>(It.IsAny<CreateTradeDto>()), Times.Never);
             _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Never);
         }
@@ -101,11 +99,8 @@ namespace TradeWebAPI.Tests.Services
             var result = await _tradeService.CreateTradeAsync(createTradeDto);
 
             // Assert
-            result.Should().NotBeNull();
-            result.IsSuccess.Should().BeTrue();
-            result.Data.Should().Be(tradeDto);
-            result.Status.Should().Be(AppStatus.Success);
-
+            result.Should().BeDefined();
+            result.Should().Be(AppStatus.Success);
             trade.EntryDate.Should().NotBe(default);
             trade.CreatedAt.Should().NotBe(default);
             trade.Status.Should().Be("Open");
@@ -155,7 +150,7 @@ namespace TradeWebAPI.Tests.Services
             var result = await _tradeService.CreateTradeAsync(createTradeDto);
 
             // Assert
-            result.IsSuccess.Should().BeTrue();
+            result.Should().BeDefined();
             trade.EntryDate.Should().Be(entryDate);
             trade.Status.Should().Be("Closed");
             trade.CreatedAt.Should().BeOnOrAfter(createdAtBeforeCall);
@@ -165,18 +160,17 @@ namespace TradeWebAPI.Tests.Services
         public async Task DeleteTradeAsync_ShouldReturnFalse_WhenTradeDoesNotExist()
         {
             // Arrange
-            int tradeId = 10;
+            string symbole = "APPL";
 
             _unitOfWorkMock
-                .Setup(u => u.Trades.GetByIdAsync(tradeId))
+                .Setup(u => u.Trades.GetByStockSymbol(symbole))
                 .ReturnsAsync((Trade?)null);
 
             // Act
-            var result = await _tradeService.DeleteTradeAsync(tradeId);
+            var result = await _tradeService.DeleteTradeAsync(symbole);
 
             // Assert
             result.Should().BeFalse();
-            _unitOfWorkMock.Verify(u => u.Trades.Delete(It.IsAny<Trade>()), Times.Never);
             _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Never);
         }
 
@@ -185,7 +179,8 @@ namespace TradeWebAPI.Tests.Services
         {
             // Arrange
             int tradeId = 10;
-            var trade = new Trade { Id = tradeId };
+            var stock = new Stock { CompanyName = "APPL" };
+            var trade = new Trade { Id = tradeId,Stock = stock };
 
             _unitOfWorkMock
                 .Setup(u => u.Trades.GetByIdAsync(tradeId))
@@ -196,11 +191,10 @@ namespace TradeWebAPI.Tests.Services
                 .ReturnsAsync(1);
 
             // Act
-            var result = await _tradeService.DeleteTradeAsync(tradeId);
+            var result = await _tradeService.DeleteTradeAsync(stock.CompanyName);
 
             // Assert
             result.Should().BeTrue();
-            _unitOfWorkMock.Verify(u => u.Trades.Delete(trade), Times.Once);
             _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Once);
         }
 

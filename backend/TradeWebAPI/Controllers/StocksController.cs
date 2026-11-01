@@ -30,7 +30,7 @@ namespace TradeWebAPI.Controllers
 
                 _logger.LogInformation("StocksController.GetStocks completed successfully.");
 
-                return Ok(stocks);
+                return Ok(stocks.Data);
             }
             catch (Exception ex)
             {
@@ -46,12 +46,12 @@ namespace TradeWebAPI.Controllers
             try
             {
                 var stock = await _stockService.GetStockByIdAsync(id);
-                if (stock == null)
+                if (!stock.IsSuccess)
                 {
                     _logger.LogWarning("GetStock failed. Stock not found. StockId: {StockId}", id);
                     return NotFound();
                 }
-                return Ok(stock);
+                return Ok(stock.Data);
             }
             catch (Exception ex)
             {
@@ -74,9 +74,9 @@ namespace TradeWebAPI.Controllers
 
                 _logger.LogInformation(
                     "StocksController.CreateStock completed successfully. StockId: {StockId}",
-                    createdStock.Id);
+                    createdStock.Data.Id);
 
-                return CreatedAtAction(nameof(GetStock), new { id = createdStock.Id }, createdStock);
+                return CreatedAtAction(nameof(GetStock), new { id = createdStock.Data.Id }, createdStock.Data);
             }
             catch (Exception ex)
             {
@@ -97,7 +97,7 @@ namespace TradeWebAPI.Controllers
             {
                 _logger.LogInformation("StocksController.DeleteStock started. StockId: {StockId}", id);
                 var deleted = await _stockService.DeleteStockAsync(id);
-                if (!deleted)
+                if (!deleted.IsSuccess)
                 {
                     _logger.LogWarning("StocksController.DeleteStock failed. Stock not found. StockId: {StockId}", id);
                     return NotFound();

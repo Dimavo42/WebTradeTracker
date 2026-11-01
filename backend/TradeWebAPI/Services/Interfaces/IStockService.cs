@@ -1,12 +1,13 @@
-﻿using TradeWebAPI.DTOs;
+﻿using TradeWebAPI.Common;
+using TradeWebAPI.DTOs;
 
 namespace TradeWebAPI.Services.Interfaces
 {
     public interface IStockService
     {
-        Task<IEnumerable<StockDto>> GetStocksAsync();
-        Task<StockDto?> GetStockByIdAsync(int id);
-        Task<StockDto> CreateStockAsync(CreateStockDto dto);
-        Task<bool> DeleteStockAsync(int id);
+        Task<ServiceResult<IEnumerable<StockDto>>> GetStocksAsync();
+        Task<ServiceResult<StockDto>> GetStockByIdAsync(int id);
+        Task<ServiceResult<StockDto>> CreateStockAsync(CreateStockDto dto);
+        Task<ServiceResult<bool>> DeleteStockAsync(int id);
     }
 }
