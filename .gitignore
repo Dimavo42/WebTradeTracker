@@ -1,7 +1,7 @@
 # -----------------------------
 # Visual Studio / .NET
 # -----------------------------
-backend/.vs/
+.vs/
 *.suo
 *.user
 *.userosscache
@@ -25,8 +25,14 @@ yarn-error.log*
 pnpm-debug.log*
 
 coverage/
+*.tsbuildinfo
 
-audit/node_modules/
+# -----------------------------
+# Local databases (audit SQLite)
+# -----------------------------
+*.db
+*.db-shm
+*.db-wal
 
 # -----------------------------
 # Environment variables
@@ -35,6 +41,7 @@ audit/node_modules/
 .env.*
 .env.local
 .env.*.local
+!.env.example
 
 # -----------------------------
 # Logs
