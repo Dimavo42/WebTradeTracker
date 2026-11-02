@@ -15,6 +15,8 @@ namespace TradeWebAPI.Repositories
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<UserStock> UserStocks { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -74,6 +76,40 @@ namespace TradeWebAPI.Repositories
                     .HasForeignKey(x => x.StockId)
                     .OnDelete(DeleteBehavior.Cascade);
 
+                entity.HasOne(x => x.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(x => x.UserId);
+
+            });
+            modelBuilder.Entity<UserStock>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.EntryPrice)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.Quantity)
+                    .HasColumnType("decimal(18,2)");
+
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasOne(x => x.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(x => x.Stock)
+                    .WithMany()
+                    .HasForeignKey(x => x.StockId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // A user can select each stock only once
+                entity.HasIndex(x => new { x.UserId, x.StockId })
+                    .IsUnique();
             });
             modelBuilder.Entity<User>(entity =>
             {

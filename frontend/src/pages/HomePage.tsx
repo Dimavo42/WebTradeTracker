@@ -4,12 +4,9 @@ import { useMarketStocks } from "../hooks/useMarketStocks";
 import { useTrades } from "../hooks/useTrades";
 import ErrorMessage from "../components/common/ErrorMessage";
 import StockFilters from "../components/market/StockFilters";
-import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
+import { useAppSelector } from "../hooks/reduxHooks";
 import Button from "../components/common/Button";
-import {
-  addUserTradeStock,
-  removeTradeStock,
-} from "../features/userStocks";
+import { useUserStocks } from "../hooks/useUserStocks";
 import type { MarketStock } from "../types/stock";
 import { useState } from "react";
 
@@ -49,8 +46,7 @@ export default function HomePage() {
   const isFund = appliedFilters.type !== "stock";
   const isLoggedIn = useAppSelector((state) => state.auth.isAuthenticated);
   const token = useAppSelector((state) => state.auth.token);
-  const userStocks = useAppSelector((state) => state.userTradeStocks);
-  const dispatch = useAppDispatch();
+  const { stocks: userStocks, addStock, removeStock } = useUserStocks();
   const { trades, deleteTrade, error: tradesError } = useTrades(token);
   const journalSymbols = new Set(trades.map((t) => t.symbol));
   const [page,setPage] = useState(1);
@@ -70,7 +66,7 @@ export default function HomePage() {
 
       const existing = userStocks.find((s) => s.symbol === stock.symbol);
       if (existing) {
-        dispatch(removeTradeStock(existing));
+        removeStock(existing);
       }
     } catch {
       // error already handled in hook
@@ -81,19 +77,17 @@ export default function HomePage() {
     const existing = userStocks.find((s) => s.symbol === stock.symbol);
 
     if (existing) {
-      dispatch(removeTradeStock(existing));
+      removeStock(existing);
       return;
     }
 
-    dispatch(
-      addUserTradeStock({
-        id: stock.symbol,
-        symbol: stock.symbol,
-        name: stock.companyName,
-        entryPrice: stock.price ?? 0,
-        quantity: 0,
-      })
-    );
+    addStock({
+      id: stock.symbol,
+      symbol: stock.symbol,
+      name: stock.companyName,
+      entryPrice: stock.price ?? 0,
+      quantity: 0,
+    });
   };
 
   return (

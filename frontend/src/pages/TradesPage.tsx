@@ -6,17 +6,17 @@ import TradeStats from "../components/trade/TradeStats";
 import ErrorMessage from "../components/common/ErrorMessage";
 import styles from "./TradesPage.module.css";
 import { useTrades } from "../hooks/useTrades";
-import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
-import {
-  removeTradeStock,
-  updateTradeStock,
-  type userTradeStocks,
-} from "../features/userStocks";
+import { useAppSelector } from "../hooks/reduxHooks";
+import { useUserStocks } from "../hooks/useUserStocks";
+import type { userTradeStocks } from "../features/userStocks";
 
 export default function TradesPage() {
   const token = useAppSelector((state) => state.auth.token);
-  const userStocks = useAppSelector((state) => state.userTradeStocks);
-  const dispatch = useAppDispatch();
+  const {
+    stocks: userStocks,
+    updateStock,
+    removeStock,
+  } = useUserStocks();
 
   const { trades, loading, error, addTrade, deleteTrade, updateTrade } =
     useTrades(token);
@@ -39,7 +39,7 @@ export default function TradesPage() {
         tradeDate: new Date().toISOString(),
       });
 
-      dispatch(removeTradeStock(stock));
+      removeStock(stock);
     } catch {
       // error already handled in hook
     }
@@ -96,8 +96,8 @@ export default function TradesPage() {
 
       <SelectedStocksTable
         stocks={userStocks}
-        onUpdate={(stock) => dispatch(updateTradeStock(stock))}
-        onRemove={(stock) => dispatch(removeTradeStock(stock))}
+        onUpdate={updateStock}
+        onRemove={removeStock}
         onAddTrade={handleAddTradeFromStock}
       />
 

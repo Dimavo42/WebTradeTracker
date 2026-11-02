@@ -15,6 +15,8 @@ import { Token } from '../common/decorators/token.decorator';
 import { Trade } from './types/trade.types';
 import type { CreateTradeDto } from './dto/createTrade.dto';
 import type { UpdateTradeDto } from './dto/updateTrade.dto';
+import type { SaveUserStockDto } from './dto/saveUserStock.dto';
+import { UserStock } from './types/userStock.types';
 
 @Controller('journal')
 @UseGuards(JwtAuthGuard)
@@ -49,5 +51,27 @@ export class JournalController {
     @Token() token: string,
   ): Promise<void> {
     return this.journalService.deleteTradesBySymbol(symbol, token);
+  }
+
+  @Get('stocks')
+  getStocks(@Token() token: string): Promise<UserStock[]> {
+    return this.journalService.getStocks(token);
+  }
+
+  @Put('stocks/:symbol')
+  saveStock(
+    @Param('symbol') symbol: string,
+    @Body() dto: SaveUserStockDto,
+    @Token() token: string,
+  ): Promise<UserStock> {
+    return this.journalService.saveStock(symbol, dto, token);
+  }
+
+  @Delete('stocks/:symbol')
+  removeStock(
+    @Param('symbol') symbol: string,
+    @Token() token: string,
+  ): Promise<void> {
+    return this.journalService.removeStock(symbol, token);
   }
 }

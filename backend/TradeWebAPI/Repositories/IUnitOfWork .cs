@@ -7,6 +7,7 @@ namespace TradeWebAPI.Repositories
         public IUserRepository Users { get; }
         public ITradeRepository Trades { get; }
         public IStockRepository Stocks { get; }
+        public IUserStockRepository UserStocks { get; }
         public Task<int> CompleteAsync();
 
     }

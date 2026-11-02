@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TradeWebAPI.DTOs;
 using TradeWebAPI.Enums;
 using TradeWebAPI.Services.Interfaces;
@@ -7,6 +8,7 @@ namespace TradeWebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TradeController : BaseController
     {
 
@@ -20,10 +22,10 @@ namespace TradeWebAPI.Controllers
         }
 
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateTrade(int id, [FromBody] UpdateTradeDto dto)
         {
-            var result = await _tradeService.UpdateTradeAsync(id, dto);
+            var result = await _tradeService.UpdateTradeAsync(id, dto, GetCurrentUserId());
 
             if (!result.IsSuccess)
             {
@@ -45,7 +47,7 @@ namespace TradeWebAPI.Controllers
             try
             {
                 _logger.LogInformation("GetTrades started.");
-                var result = await _tradeService.GetTradesAsync();
+                var result = await _tradeService.GetTradesAsync(GetCurrentUserId());
 
                 if (!result.IsSuccess)
                 {
@@ -63,14 +65,14 @@ namespace TradeWebAPI.Controllers
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetTrade(int id)
         {
             try
             {
                 _logger.LogInformation("GetTrade started. TradeId: {TradeId}", id);
 
-                var trade = await _tradeService.GetTradeByIdAsync(id);
+                var trade = await _tradeService.GetTradeByIdAsync(id, GetCurrentUserId());
 
                 if (!trade.IsSuccess)
                 {
@@ -99,7 +101,7 @@ namespace TradeWebAPI.Controllers
                     dto?.TradeType,
                     dto?.Quantity);
 
-                var result = await _tradeService.CreateTradeAsync(dto);
+                var result = await _tradeService.CreateTradeAsync(dto, GetCurrentUserId());
 
                 if (!result.IsSuccess)
                 {
@@ -136,7 +138,7 @@ namespace TradeWebAPI.Controllers
             {
                 _logger.LogInformation("DeleteTrade started. TradeId: {TradeId}", symbol);
 
-                var deleted = await _tradeService.DeleteTradeAsync(symbol);
+                var deleted = await _tradeService.DeleteTradeAsync(symbol, GetCurrentUserId());
 
                 if (!deleted.IsSuccess)
                 {

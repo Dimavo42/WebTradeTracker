@@ -8,8 +8,11 @@ import NotFoundPage from "../pages/NotFoundPage";
 import HomePage from "../pages/HomePage";
 import Chatbot from "../components/chatbot/Chatbot";
 import styles from "../styles/main.module.css";
+import { useLoadUserStocks } from "../hooks/useUserStocks";
 
 export default function AppRouter() {
+  useLoadUserStocks();
+
   return (
     <BrowserRouter>
       <Navbar />

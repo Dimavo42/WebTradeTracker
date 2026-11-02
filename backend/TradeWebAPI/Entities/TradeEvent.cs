@@ -3,6 +3,8 @@
     {
         public int Id { get; set; }
 
+        public int UserId { get; set; }
+
         public int StockId { get; set; }
         public string TradeType { get; set; } = string.Empty;
         public decimal Quantity { get; set; }

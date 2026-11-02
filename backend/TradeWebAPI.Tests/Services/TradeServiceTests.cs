@@ -6,6 +6,7 @@ using TradeWebAPI.DTOs;
 using TradeWebAPI.Entities;
 using TradeWebAPI.Enums;
 using TradeWebAPI.Repositories;
+using TradeWebAPI.Repositories.Interfaces;
 using TradeWebAPI.Services.Implementations;
 using TradeWebAPI.Services.Interfaces;
 
@@ -13,264 +14,185 @@ namespace TradeWebAPI.Tests.Services
 {
     public class TradeServiceTests
     {
+        private const int UserA = 7;
+        private const int UserB = 8;
+
         private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly Mock<ITradeRepository> _tradeRepositoryMock;
+        private readonly Mock<IStockRepository> _stockRepositoryMock;
         private readonly Mock<ILogger<TradeService>> _loggerMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<ITradeValidator> _tradeValidatorMock;
+        private readonly Mock<ITradeProducer> _tradeProducerMock;
 
         private readonly TradeService _tradeService;
 
         public TradeServiceTests()
         {
             _unitOfWorkMock = new Mock<IUnitOfWork>();
+            _tradeRepositoryMock = new Mock<ITradeRepository>();
+            _stockRepositoryMock = new Mock<IStockRepository>();
             _loggerMock = new Mock<ILogger<TradeService>>();
             _mapperMock = new Mock<IMapper>();
             _tradeValidatorMock = new Mock<ITradeValidator>();
+            _tradeProducerMock = new Mock<ITradeProducer>();
+
+            _unitOfWorkMock.Setup(u => u.Trades).Returns(_tradeRepositoryMock.Object);
+            _unitOfWorkMock.Setup(u => u.Stocks).Returns(_stockRepositoryMock.Object);
 
             _tradeService = new TradeService(
                 _unitOfWorkMock.Object,
                 _loggerMock.Object,
                 _mapperMock.Object,
-                _tradeValidatorMock.Object);
+                _tradeValidatorMock.Object,
+                _tradeProducerMock.Object);
+        }
+
+        private static CreateTradeDto ValidBuyDto() => new()
+        {
+            StockSymbol = "aapl",
+            TradeType = "Buy",
+            Status = "Open",
+            Quantity = 2,
+            Price = 100,
+            Fees = 1,
+            TradeDate = new DateTime(2026, 1, 1)
+        };
+
+        [Fact]
+        public async Task CreateTradeAsync_ShouldReturnValidatorStatus_WhenValidationFails()
+        {
+            var dto = ValidBuyDto();
+            _tradeValidatorMock
+                .Setup(v => v.ValidateCreateTradeAsync(dto))
+                .ReturnsAsync(AppStatus.InvalidTradeDate);
+
+                        var result = await _tradeService.CreateTradeAsync(dto, UserA);
+
+            result.IsSuccess.Should().BeFalse();
+            result.Status.Should().Be(AppStatus.InvalidTradeDate);
+            _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Never);
+            _tradeProducerMock.Verify(p => p.PublishTrade(It.IsAny<Trade>(), It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task CreateTradeAsync_ShouldReturnFailure_WhenValidationFails()
+        public async Task CreateTradeAsync_ShouldOwnTradeByCallingUser_WhenValid()
         {
-            // Arrange
-            var createTradeDto = new CreateTradeDto();
+            var dto = ValidBuyDto();
+            var stock = new Stock { Id = 1, Symbol = "AAPL", CompanyName = "Apple" };
+            Trade? added = null;
 
-            _tradeValidatorMock
-                .Setup(v => v.ValidateCreateTradeAsync(createTradeDto))
-                .ReturnsAsync(AppStatus.InvalidRequest);
+            _tradeValidatorMock.Setup(v => v.ValidateCreateTradeAsync(dto)).ReturnsAsync(AppStatus.Success);
+            _stockRepositoryMock.Setup(s => s.GetBySymbolAsync("AAPL")).ReturnsAsync(stock);
+            _tradeRepositoryMock
+                .Setup(t => t.AddAsync(It.IsAny<Trade>()))
+                .Callback<Trade>(t => added = t)
+                .Returns(Task.CompletedTask);
 
-            // Act
-            var result = await _tradeService.CreateTradeAsync(createTradeDto);
+                        var result = await _tradeService.CreateTradeAsync(dto, UserA);
 
-            // Assert
-            result.Should().BeDefined();
-            result.Should().Be(AppStatus.InvalidRequest);
-            _mapperMock.Verify(m => m.Map<Trade>(It.IsAny<CreateTradeDto>()), Times.Never);
+            result.IsSuccess.Should().BeTrue();
+            added.Should().NotBeNull();
+            added!.UserId.Should().Be(UserA);
+            added.Stock.Should().BeSameAs(stock);
+            added.EntryPrice.Should().Be(100);
+            _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Once);
+            _tradeProducerMock.Verify(p => p.PublishTrade(added, It.IsAny<string>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateTradeAsync_ShouldReturnInvalidRequest_WhenTradeTypeIsUnknown()
+        {
+            var dto = ValidBuyDto();
+            dto.TradeType = "Hold";
+            _tradeValidatorMock.Setup(v => v.ValidateCreateTradeAsync(dto)).ReturnsAsync(AppStatus.Success);
+            _stockRepositoryMock.Setup(s => s.GetBySymbolAsync("AAPL")).ReturnsAsync(new Stock { Symbol = "AAPL" });
+
+                        var result = await _tradeService.CreateTradeAsync(dto, UserA);
+
+            result.Status.Should().Be(AppStatus.InvalidRequest);
             _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Never);
         }
 
         [Fact]
-        public async Task CreateTradeAsync_ShouldAddTradeAndReturnSuccess_WhenValidationSucceeds()
+        public async Task GetTradesAsync_ShouldOnlyQueryTheCallingUsersTrades()
         {
-            // Arrange
-            var createTradeDto = new CreateTradeDto
-            {
-                // fill properties if needed
-            };
+            var trades = new List<Trade> { new() { Id = 1, UserId = UserA }, new() { Id = 2, UserId = UserA } };
+            var tradeDtos = new List<TradeDto> { new() { Id = 1 }, new() { Id = 2 } };
 
-            var trade = new Trade
-            {
-                EntryDate = default,
-                CreatedAt = default,
-                Status = null
-            };
+            _tradeRepositoryMock.Setup(t => t.GetAllTradesByUserIdAsync(UserA)).ReturnsAsync(trades);
+            _mapperMock.Setup(m => m.Map<List<TradeDto>>(trades)).Returns(tradeDtos);
 
-            var tradeDto = new TradeDto
-            {
-                Id = 1
-            };
+                        var result = await _tradeService.GetTradesAsync(UserA);
 
-            _tradeValidatorMock
-                .Setup(v => v.ValidateCreateTradeAsync(createTradeDto))
-                .ReturnsAsync(AppStatus.Success);
-
-            _mapperMock
-                .Setup(m => m.Map<Trade>(createTradeDto))
-                .Returns(trade);
-
-            _mapperMock
-                .Setup(m => m.Map<TradeDto>(trade))
-                .Returns(tradeDto);
-
-            _unitOfWorkMock
-                .Setup(u => u.Trades.AddAsync(trade))
-                .Returns(Task.CompletedTask);
-
-            _unitOfWorkMock
-                .Setup(u => u.CompleteAsync())
-                .ReturnsAsync(1);
-
-            // Act
-            var result = await _tradeService.CreateTradeAsync(createTradeDto);
-
-            // Assert
-            result.Should().BeDefined();
-            result.Should().Be(AppStatus.Success);
-            trade.EntryDate.Should().NotBe(default);
-            trade.CreatedAt.Should().NotBe(default);
-            trade.Status.Should().Be("Open");
-
-            _unitOfWorkMock.Verify(u => u.Trades.AddAsync(trade), Times.Once);
-            _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Once);
+            result.IsSuccess.Should().BeTrue();
+            result.Data.Should().BeEquivalentTo(tradeDtos);
+            _tradeRepositoryMock.Verify(t => t.GetAllTradesByUserIdAsync(UserA), Times.Once);
+            _tradeRepositoryMock.Verify(t => t.GetAllTradesByUserIdAsync(It.Is<int>(id => id != UserA)), Times.Never);
         }
 
         [Fact]
-        public async Task CreateTradeAsync_ShouldKeepExistingEntryDateAndStatus_WhenAlreadyProvided()
+        public async Task GetTradeByIdAsync_ShouldReturnNotFound_WhenTradeBelongsToAnotherUser()
         {
-            // Arrange
-            var createTradeDto = new CreateTradeDto();
+            // The repository filters by owner, so user B looking up user A's trade gets nothing
+            _tradeRepositoryMock.Setup(t => t.GetByIdAsync(5, UserB)).ReturnsAsync((Trade?)null);
 
-            var entryDate = new DateTime(2025, 1, 1);
-            var createdAtBeforeCall = DateTime.UtcNow;
+                        var result = await _tradeService.GetTradeByIdAsync(5, UserB);
 
-            var trade = new Trade
-            {
-                EntryDate = entryDate,
-                Status = "Closed"
-            };
-
-            var tradeDto = new TradeDto();
-
-            _tradeValidatorMock
-                .Setup(v => v.ValidateCreateTradeAsync(createTradeDto))
-                .ReturnsAsync(AppStatus.Success);
-
-            _mapperMock
-                .Setup(m => m.Map<Trade>(createTradeDto))
-                .Returns(trade);
-
-            _mapperMock
-                .Setup(m => m.Map<TradeDto>(trade))
-                .Returns(tradeDto);
-
-            _unitOfWorkMock
-                .Setup(u => u.Trades.AddAsync(trade))
-                .Returns(Task.CompletedTask);
-
-            _unitOfWorkMock
-                .Setup(u => u.CompleteAsync())
-                .ReturnsAsync(1);
-
-            // Act
-            var result = await _tradeService.CreateTradeAsync(createTradeDto);
-
-            // Assert
-            result.Should().BeDefined();
-            trade.EntryDate.Should().Be(entryDate);
-            trade.Status.Should().Be("Closed");
-            trade.CreatedAt.Should().BeOnOrAfter(createdAtBeforeCall);
-        }
-
-        [Fact]
-        public async Task DeleteTradeAsync_ShouldReturnFalse_WhenTradeDoesNotExist()
-        {
-            // Arrange
-            string symbole = "APPL";
-
-            _unitOfWorkMock
-                .Setup(u => u.Trades.GetByStockSymbol(symbole))
-                .ReturnsAsync((Trade?)null);
-
-            // Act
-            var result = await _tradeService.DeleteTradeAsync(symbole);
-
-            // Assert
-            result.Should().BeFalse();
-            _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Never);
-        }
-
-        [Fact]
-        public async Task DeleteTradeAsync_ShouldDeleteTradeAndReturnTrue_WhenTradeExists()
-        {
-            // Arrange
-            int tradeId = 10;
-            var stock = new Stock { CompanyName = "APPL" };
-            var trade = new Trade { Id = tradeId,Stock = stock };
-
-            _unitOfWorkMock
-                .Setup(u => u.Trades.GetByIdAsync(tradeId))
-                .ReturnsAsync(trade);
-
-            _unitOfWorkMock
-                .Setup(u => u.CompleteAsync())
-                .ReturnsAsync(1);
-
-            // Act
-            var result = await _tradeService.DeleteTradeAsync(stock.CompanyName);
-
-            // Assert
-            result.Should().BeTrue();
-            _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Once);
-        }
-
-        [Fact]
-        public async Task GetTradeByIdAsync_ShouldReturnNull_WhenTradeDoesNotExist()
-        {
-            // Arrange
-            int tradeId = 5;
-
-            _unitOfWorkMock
-                .Setup(u => u.Trades.GetByIdAsync(tradeId))
-                .ReturnsAsync((Trade?)null);
-
-            // Act
-            var result = await _tradeService.GetTradeByIdAsync(tradeId);
-
-            // Assert
-            result.Should().BeNull();
+            result.IsSuccess.Should().BeFalse();
+            result.Status.Should().Be(AppStatus.NotFound);
             _mapperMock.Verify(m => m.Map<TradeDto>(It.IsAny<Trade>()), Times.Never);
         }
 
         [Fact]
-        public async Task GetTradeByIdAsync_ShouldReturnMappedDto_WhenTradeExists()
+        public async Task GetTradeByIdAsync_ShouldReturnMappedDto_WhenTradeBelongsToUser()
         {
-            // Arrange
-            int tradeId = 5;
-            var trade = new Trade { Id = tradeId };
-            var tradeDto = new TradeDto { Id = tradeId };
+            var trade = new Trade { Id = 5, UserId = UserA };
+            var tradeDto = new TradeDto { Id = 5 };
+            _tradeRepositoryMock.Setup(t => t.GetByIdAsync(5, UserA)).ReturnsAsync(trade);
+            _mapperMock.Setup(m => m.Map<TradeDto>(trade)).Returns(tradeDto);
 
-            _unitOfWorkMock
-                .Setup(u => u.Trades.GetByIdAsync(tradeId))
-                .ReturnsAsync(trade);
+                        var result = await _tradeService.GetTradeByIdAsync(5, UserA);
 
-            _mapperMock
-                .Setup(m => m.Map<TradeDto>(trade))
-                .Returns(tradeDto);
-
-            // Act
-            var result = await _tradeService.GetTradeByIdAsync(tradeId);
-
-            // Assert
-            result.Should().NotBeNull();
-            result.Should().Be(tradeDto);
+            result.IsSuccess.Should().BeTrue();
+            result.Data.Should().Be(tradeDto);
         }
 
         [Fact]
-        public async Task GetTradesAsync_ShouldReturnMappedTrades()
+        public async Task UpdateTradeAsync_ShouldReturnNotFound_AndNotSave_WhenTradeBelongsToAnotherUser()
         {
-            // Arrange
-            var trades = new List<Trade>
-            {
-                new Trade { Id = 1 },
-                new Trade { Id = 2 }
-            };
+            _tradeRepositoryMock.Setup(t => t.GetByIdAsync(5, UserB)).ReturnsAsync((Trade?)null);
 
-            var tradeDtos = new List<TradeDto>
-            {
-                new TradeDto { Id = 1 },
-                new TradeDto { Id = 2 }
-            };
+                        var result = await _tradeService.UpdateTradeAsync(5, new UpdateTradeDto(), UserB);
 
-            _unitOfWorkMock
-                .Setup(u => u.Trades.GetAllAsync())
-                .ReturnsAsync(trades);
+            result.Status.Should().Be(AppStatus.NotFound);
+            _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Never);
+        }
 
-            _mapperMock
-                .Setup(m => m.Map<List<TradeDto>>(trades))
-                .Returns(tradeDtos);
+        [Fact]
+        public async Task DeleteTradeAsync_ShouldOnlyDeleteTheCallingUsersTrades()
+        {
+            _tradeRepositoryMock.Setup(t => t.DeleteTradesByStockSymbolAsync("AAPL", UserA)).ReturnsAsync(true);
 
-            // Act
-            var result = await _tradeService.GetTradesAsync();
+                        var result = await _tradeService.DeleteTradeAsync(" aapl ", UserA);
 
-            // Assert
-            result.Should().NotBeNull();
-            result.Should().HaveCount(2);
-            result.Should().BeEquivalentTo(tradeDtos);
+            result.IsSuccess.Should().BeTrue();
+            _tradeRepositoryMock.Verify(t => t.DeleteTradesByStockSymbolAsync("AAPL", UserA), Times.Once);
+            _tradeRepositoryMock.Verify(
+                t => t.DeleteTradesByStockSymbolAsync(It.IsAny<string>(), It.Is<int>(id => id != UserA)),
+                Times.Never);
+            _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteTradeAsync_ShouldFail_AndNotSave_WhenUserHasNoTradesForSymbol()
+        {
+            _tradeRepositoryMock.Setup(t => t.DeleteTradesByStockSymbolAsync("AAPL", UserB)).ReturnsAsync(false);
+
+                        var result = await _tradeService.DeleteTradeAsync("AAPL", UserB);
+
+            result.IsSuccess.Should().BeFalse();
+            _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Never);
         }
     }
 }

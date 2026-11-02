@@ -49,6 +49,7 @@ namespace TradeWebAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     StockId = table.Column<int>(type: "int", nullable: false),
                     TradeType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
@@ -70,65 +71,41 @@ namespace TradeWebAPI.Migrations
                         principalTable: "Stocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Trades_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "Stocks",
-                columns: new[] { "Id", "Symbol", "CompanyName", "Exchange", "Sector", "CreatedAt" },
-                values: new object[,]
+            migrationBuilder.CreateTable(
+                name: "UserStocks",
+                columns: table => new
                 {
-                    { 1, "AAPL", "Apple Inc.", "NASDAQ", "Technology", new DateTime(2026, 3, 12, 12, 0, 0, DateTimeKind.Utc) },
-                    { 2, "MSFT", "Microsoft Corporation", "NASDAQ", "Technology", new DateTime(2026, 3, 12, 12, 5, 0, DateTimeKind.Utc) },
-                    { 3, "TSLA", "Tesla Inc.", "NASDAQ", "Automotive", new DateTime(2026, 3, 12, 12, 10, 0, DateTimeKind.Utc) },
-                    { 4, "AMZN", "Amazon.com Inc.", "NASDAQ", "E-Commerce", new DateTime(2026, 3, 12, 12, 15, 0, DateTimeKind.Utc) },
-                    { 5, "NVDA", "NVIDIA Corporation", "NASDAQ", "Semiconductors", new DateTime(2026, 3, 12, 12, 20, 0, DateTimeKind.Utc) }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Users",
-                columns: new[] { "Id", "Email", "PasswordHash", "Role" },
-                values: new object[,]
-                {
-                    //Admin123!
-                    //user123
-                    { 1, "admin@test.com", "$2b$10$tQv.ENeqjisPOg.iuSVglOkXvnOuhVf5oBgkxWlpyGlyRwrY19AyG", "Admin" },
-                    { 2,  "user@test.com", "$2b$10$1D/iavoSGh4BCTEDg4/KuOEEvK6fzM3jPraFDnJI7j2Bdf1YuDpKq", "User" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Trades",
-                columns: new[]
-                {
-                    "Id", "StockId", "TradeType", "Quantity", "EntryPrice",
-                    "ExitPrice", "EntryDate", "ExitDate", "Fees", "Status", "Notes", "CreatedAt"
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    StockId = table.Column<int>(type: "int", nullable: false),
+                    EntryPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
                 },
-                values: new object[,]
+                constraints: table =>
                 {
-                    {
-                        1, 1, "Buy", 10m, 185.50m,
-                        null, new DateTime(2026, 3, 10, 14, 30, 0, DateTimeKind.Utc), null,
-                        2.50m, "Open", "Seeded demo trade for Apple", new DateTime(2026, 3, 12, 12, 30, 0, DateTimeKind.Utc)
-                    },
-                    {
-                        2, 2, "Buy", 5m, 410.00m,
-                        425.75m, new DateTime(2026, 3, 8, 10, 0, 0, DateTimeKind.Utc), new DateTime(2026, 3, 11, 15, 0, 0, DateTimeKind.Utc),
-                        1.80m, "Closed", "Seeded demo trade for Microsoft", new DateTime(2026, 3, 12, 12, 35, 0, DateTimeKind.Utc)
-                    },
-                    {
-                        3, 3, "Sell", 8m, 240.25m,
-                        null, new DateTime(2026, 3, 9, 9, 15, 0, DateTimeKind.Utc), null,
-                        2.10m, "Open", "Seeded short trade for Tesla", new DateTime(2026, 3, 12, 12, 40, 0, DateTimeKind.Utc)
-                    },
-                    {
-                        4, 4, "Buy", 12m, 172.90m,
-                        180.10m, new DateTime(2026, 3, 5, 13, 45, 0, DateTimeKind.Utc), new DateTime(2026, 3, 7, 16, 20, 0, DateTimeKind.Utc),
-                        3.00m, "Closed", "Seeded trade for Amazon", new DateTime(2026, 3, 12, 12, 45, 0, DateTimeKind.Utc)
-                    },
-                    {
-                        5, 5, "Buy", 20m, 890.00m,
-                        null, new DateTime(2026, 3, 11, 11, 10, 0, DateTimeKind.Utc), null,
-                        4.25m, "Open", "Seeded trade for NVIDIA", new DateTime(2026, 3, 12, 12, 50, 0, DateTimeKind.Utc)
-                    }
+                    table.PrimaryKey("PK_UserStocks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserStocks_Stocks_StockId",
+                        column: x => x.StockId,
+                        principalTable: "Stocks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserStocks_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -143,9 +120,25 @@ namespace TradeWebAPI.Migrations
                 column: "StockId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Trades_UserId",
+                table: "Trades",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_Email",
                 table: "Users",
                 column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserStocks_StockId",
+                table: "UserStocks",
+                column: "StockId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserStocks_UserId_StockId",
+                table: "UserStocks",
+                columns: new[] { "UserId", "StockId" },
                 unique: true);
         }
 
@@ -156,10 +149,13 @@ namespace TradeWebAPI.Migrations
                 name: "Trades");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "UserStocks");
 
             migrationBuilder.DropTable(
                 name: "Stocks");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }
