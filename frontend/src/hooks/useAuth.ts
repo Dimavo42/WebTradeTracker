@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { login as loginApi, register as registerApi } from "../api/authApi";
+import { login as loginApi, loginWithGoogle, register as registerApi } from "../api/authApi";
 import type {
   AuthResponse,
   LoginRequest,
@@ -55,11 +55,41 @@ export function useAuth() {
       setLoading(false);
     }
   };
+ 
 
+  const loginWithGoogleMock = async ():Promise<AuthResponse>=>{
+    setLoading(true);
+    setError(null);
+    let popup: Window | null = null;
+    try {
+      const width = 500;
+      const height = 600;
+      const left = window.screenX + (window.innerWidth - width) / 2;
+      const top = window.screenY + (window.innerHeight - height) / 2;
+      popup = window.open(
+        'about:blank',
+        'google-login-mock',
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+      // The popup is only for show; a blocked popup must not stop the mock login
+      await new Promise<void>((resolve) => {
+        setTimeout(resolve, 1000); // Simulate a delay for the popup to open
+      });
+      return await loginWithGoogle();
+    } catch (err) {
+      const message = getErrorMessage(err, "Mock Google login failed");
+      setError(message);
+      throw err;
+    } finally {
+      popup?.close();
+      setLoading(false);
+    }
+  }
 
   return {
     login,
     register,
+    loginWithGoogleMock,
     loading,
     error,
     clearError: () => setError(null),

@@ -103,4 +103,22 @@ export class AuthService {
       throw new InternalServerErrorException('Failed to register');
     }
   }
+
+
+  async loginWithGoogle(): Promise<AuthResponseDto> {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get<AuthResponseDto>(
+          `${this.backendUrl}/api/auth/google`,
+        ),
+      );
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        throw new InternalServerErrorException('Failed to login with Google');
+      }
+      console.error('Login with Google error:', error);
+      throw new InternalServerErrorException('Failed to login with Google');
+    }
+  }
 }

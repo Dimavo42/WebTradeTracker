@@ -117,5 +117,31 @@ namespace TradeWebAPI.Services.Implementations
             _logger.LogInformation("LoginAsync succeeded. UserId: {UserId}, Email: {Email}", user.Id, user.Email);
             return ServiceResult<AuthResponseDto>.Success(response);
         }
+
+        public async Task<ServiceResult<AuthResponseDto>> LoginWithGoogle()
+        {
+             var user = await _userRepository.GetByEmailAsync("test@test.com");
+             if (user == null)
+             {
+                user = new User
+                {
+                    Email = "test@test.com",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("mockPassword"),
+                    Role = "User"
+                };
+                 await _userRepository.AddAsync(user);
+                 await _userRepository.SaveChangesAsync();
+             }
+             var token = _jwtTokenService.GenerateToken(user);
+             var response = new AuthResponseDto
+            {
+                Token = token,
+                UserId = user.Id,
+                Email = user.Email,
+                Role = user.Role
+            };
+             return ServiceResult<AuthResponseDto>.Success(response);
+        }
     }
+    
 }

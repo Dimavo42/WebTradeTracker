@@ -37,3 +37,17 @@ export async function register(data: RegisterRequest): Promise<AuthResponse> {
 
   return response.json();
 }
+
+export async function loginWithGoogle(): Promise<AuthResponse> {
+  const response = await fetch(`${BASE_URL}/google`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || `HTTP error ${response.status}`);
+  }   
+  return response.json();
+}

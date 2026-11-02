@@ -9,10 +9,10 @@ import { useAuth } from "../hooks/useAuth";
 export default function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, loading, error } = useAuth();
+  const { login, loginWithGoogleMock,loading, error } = useAuth();
+
 
   const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,6 +26,18 @@ export default function LoginPage() {
       // Error is handled in useLogin hook, no need to do anything here
     }
   };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const response = await loginWithGoogleMock();
+      dispatch(loginAction(response.token));
+      navigate("/");
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (err) {
+      // Error is handled in useAuth hook
+    }
+  };
+
 
   return (
   <div className={styles.container}>
@@ -57,6 +69,14 @@ export default function LoginPage() {
       <p>
         Don't have an account? <Link to="/register">Register</Link>
       </p>
+      <button
+        type="button"
+        className="loginGoogle"
+        onClick={handleGoogleLogin}
+        disabled={loading}
+      >
+        Login with Google
+      </button>
     </form>
   </div>
 );

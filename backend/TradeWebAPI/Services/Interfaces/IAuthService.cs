@@ -7,5 +7,7 @@ namespace TradeWebAPI.Services.Interfaces
     {
         Task<ServiceResult<AuthResponseDto>> RegisterAsync(RegisterRequestDto request);
         Task<ServiceResult<AuthResponseDto>> LoginAsync(LoginRequestDto request);
+
+        Task<ServiceResult<AuthResponseDto>> LoginWithGoogle();
     }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { LoginDto } from './dto/login.dto';
 import type { RegisterDto } from './dto/register.dto';
@@ -17,4 +17,11 @@ export class AuthController {
   register(@Body() dto: RegisterDto): Promise<AuthResponseDto> {
     return this.authService.register(dto);
   }
+
+  @Get('google')
+  async loginWithGoogle(): Promise<AuthResponseDto> {
+    return this.authService.loginWithGoogle();
+  }
+
+
 }

@@ -55,6 +55,24 @@ namespace TradeWebAPI.Controllers
             return Ok(result.Data);
         }
 
+
+        [AllowAnonymous]
+        [HttpGet("google")]
+        public async Task<IActionResult> LoginWithGoogleMock()
+        {
+            _logger.LogInformation("Login with Google endpoint called.");
+
+            var result = await _authService.LoginWithGoogle();
+
+            if (!result.IsSuccess)
+            {
+                _logger.LogWarning("Login with Google failed with status: {Status}", result.Status);
+                return MapFailure(result.Status);
+            }
+
+            _logger.LogInformation("Login with Google succeeded.");
+            return Ok(result.Data);
+        }
         private IActionResult MapFailure(AppStatus status)
         {
             return status switch
