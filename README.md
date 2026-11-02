@@ -5,20 +5,23 @@ A trading journal app: browse live stock prices, pick stocks to follow, log your
 
 ## Tech Stack
 
-- **Frontend:** React + TypeScript (Vite), Redux Toolkit for state management
+- **Frontend:** React + TypeScript , Redux Toolkit for state management
 - **Mobile:** React Native (Expo)
-- **BFF:** NestJS, with live market data from Yahoo Finance (`yahoo-finance2`)
+- **Backend for fronted:** NestJS, with live market data from Yahoo Finance (`yahoo-finance2`)
 - **Backend:** .NET 8 Web API, Entity Framework Core, SQL Server
 - **Auth:** JWT authentication implemented in .NET
-- **DevOps:** Docker Compose
 
 ## Architecture
 
 ```
-React (Redux)  ─┐
-                ├─►  NestJS BFF  ─►  .NET 8 Web API  ─►  SQL Server
-React Native   ─┘        │
-                         └─►  Yahoo Finance (live prices, 5-year history)
+React (Redux) ──┐
+                ├──► NestJS BFF ──► .NET 8 Web API ──► SQL Server
+React Native ── ┘       │    │
+                        │    └──► Kafka ──► Audit Service  ──► SQLlite
+                        │
+                        └──► Yahoo Finance
+                             (live prices, 5-year history)
+                         
 ```
 
 ### Backend – .NET 8 Web API
@@ -29,7 +32,6 @@ React Native   ─┘        │
 - **Mapping & validation:** AutoMapper profiles for DTOs, a dedicated trade validator
 - **Middleware:** global exception handling and request logging
 - **API docs:** Swagger / OpenAPI
-- **Tests:** xUnit, Moq and FluentAssertions
 
 ### BFF – NestJS
 
