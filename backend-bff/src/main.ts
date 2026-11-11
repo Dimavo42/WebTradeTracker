@@ -20,7 +20,7 @@ const corsOptions: CorsOptionsDelegate<Request> = (
     origin = rawOrigin[0];
   }
 
-  const allowed = [ENV.FRONT_URL_1, ENV.FRONT_URL_2];
+  const allowed = [ENV.FRONT_URL];
 
   if (!origin) {
     return callback(null, {

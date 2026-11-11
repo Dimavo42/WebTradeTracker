@@ -9,5 +9,5 @@ function getEnv(key: keyof ImportMetaEnv): string {
 }
 
 export const ENV = {
-  BASE_URL: getEnv("VITE_BASE_URL"),
+  BASE_URL: getEnv("VITE_BASE_URL") ,
 };

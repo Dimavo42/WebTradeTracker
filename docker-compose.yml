@@ -25,10 +25,16 @@ services:
       start_period: 15s
     networks:
       - trade_network  
+
+
+
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        # URL the *browser* uses to reach the BFF (host port 3001 + Nest's /api prefix)
+        BASE_URL: "http://localhost:3001/api"
     container_name: trade_frontend
     ports:
       - "3000:80"
@@ -36,6 +42,9 @@ services:
       - backend
     networks:
       - trade_network
+
+
+      
   bff:
     build:
       context: ./backend-bff
@@ -48,11 +57,13 @@ services:
     environment:
       DOTNET_API_URL: http://backend:8080
       PORT : "3000"
-      FRONT_URL_1 : "http://frontend:3000"
+      FRONT_URL : "http://frontend:3000"
       MOBILE_ORIGIN: "*"
     networks:
       - trade_network
       
+
+
   backend:
     build:
       context: .
@@ -73,6 +84,8 @@ services:
     networks:
       - trade_network
 
+
+
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: trade_sql
@@ -85,6 +98,9 @@ services:
       - sql_data:/var/opt/mssql
     networks:
       - trade_network
+
+
+
 
   audit:
     build:
@@ -108,11 +124,35 @@ services:
      - trade_network
 
 
+
+
+  tls:
+   build:
+      context: ./tls-server
+      dockerfile: Dockerfile
+   environment:
+      SERVER_PORT: "8081"
+      UPSTREAM_HOST: "frontend"
+      UPSTREAM_PORT: "80"
+      WORKERS: 4
+      KEYS_SIZE : "4096"
+      CERT_DIR: "/app/certs"
+   volumes:
+     - tls_certs:/app/certs
+   depends_on:
+     - frontend
+   ports:
+     - "8081:8081"
+   networks:
+     - trade_network
+
+
+
 volumes:
   sql_data:
   audit_data:
+  tls_certs:
   
    
-
 networks:
   trade_network:
