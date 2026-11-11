@@ -137,6 +137,7 @@ services:
       WORKERS: 4
       KEYS_SIZE : "4096"
       CERT_DIR: "/app/certs"
+      SERVER_HOST: "0.0.0.0"
    volumes:
      - tls_certs:/app/certs
    depends_on:

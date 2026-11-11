@@ -42,7 +42,10 @@ void Server::bindSocket(){
     sockaddr_in address{};
     address.sin_family = AF_INET;
     address.sin_port = htons(_port);
-    address.sin_addr.s_addr = htonl(_address); // 0.0.0.0
+    //Translate The address to binary form
+    if (inet_pton(AF_INET, _address, &address.sin_addr) <= 0) {
+        throw std::runtime_error("Cannot bind the socket invalid address");
+    }
     if(bind(_server_fd,(sockaddr*)&address,sizeof(address))<0){
         throw std::runtime_error("Cannot bind the socket");
     }
