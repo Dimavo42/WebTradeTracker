@@ -31,7 +31,7 @@ export default function RegisterPage() {
         password: form.password,
       });
 
-      dispatch(loginAction(response.token));
+      dispatch(loginAction(response));
       navigate("/");
     } catch {
       // handled in hook

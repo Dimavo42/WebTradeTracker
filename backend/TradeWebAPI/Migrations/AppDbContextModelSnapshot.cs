@@ -61,6 +61,36 @@ namespace TradeWebAPI.Migrations
                     b.ToTable("Stocks");
                 });
 
+            modelBuilder.Entity("TradeWebAPI.Entities.SupportRequest", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("ConversationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ConversationId")
+                        .IsUnique();
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("SupportRequests");
+                });
+
             modelBuilder.Entity("TradeWebAPI.Entities.Trade", b =>
                 {
                     b.Property<int>("Id")
@@ -187,6 +217,17 @@ namespace TradeWebAPI.Migrations
                         .IsUnique();
 
                     b.ToTable("UserStocks");
+                });
+
+            modelBuilder.Entity("TradeWebAPI.Entities.SupportRequest", b =>
+                {
+                    b.HasOne("TradeWebAPI.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TradeWebAPI.Entities.Trade", b =>

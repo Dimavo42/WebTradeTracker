@@ -13,18 +13,22 @@ namespace TradeWebAPI.Repositories
 
         public IUserStockRepository UserStocks { get; }
 
+        public ISupportRequestRepository SupportRequests { get; }
+
         public UnitOfWork(
             AppDbContext context,
             ITradeRepository tradeRepository,
             IStockRepository stockRepository,
             IUserRepository users,
-            IUserStockRepository userStocks)
+            IUserStockRepository userStocks,
+            ISupportRequestRepository supportRequests)
         {
             _context = context;
             Trades = tradeRepository;
             Stocks = stockRepository;
             Users = users;
             UserStocks = userStocks;
+            SupportRequests = supportRequests;
         }
 
         public async Task<int> CompleteAsync()

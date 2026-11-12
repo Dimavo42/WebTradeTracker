@@ -67,8 +67,58 @@
 
 .headerActions {
   display: flex;
-  gap: 6px;
+  gap: 7px;
+  align-self: flex-start;
 }
+
+/* Title on top, mode buttons stacked below it */
+.headerMain {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Segmented AI / Admin toggle */
+.headerMode {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 8px;
+  background: #1f2937;
+}
+
+.modeButton {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.modeButton:hover:not(.modeActive) {
+  color: white;
+}
+
+.modeActive {
+  background: #2e7df6;
+  color: white;
+}
+
+.modeButton:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+}
+
+.modeButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 
 .headerButton {
   padding: 4px 10px;

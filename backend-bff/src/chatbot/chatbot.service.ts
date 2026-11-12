@@ -25,7 +25,7 @@ export class ChatbotService {
           },
           { timeout: 120_000 },
         ),
-      ); 
+      );
       return { message : response.data.message.content};
     } catch (e) {
       throw new InternalServerErrorException(

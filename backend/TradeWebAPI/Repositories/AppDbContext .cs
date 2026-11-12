@@ -17,6 +17,8 @@ namespace TradeWebAPI.Repositories
 
         public DbSet<UserStock> UserStocks { get; set; }
 
+        public DbSet<SupportRequest> SupportRequests { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -130,6 +132,25 @@ namespace TradeWebAPI.Repositories
 
                 entity.HasIndex(x => x.Email)
                     .IsUnique();
+            });
+            modelBuilder.Entity<SupportRequest>(entity =>
+            {
+                entity.HasKey(x => x.Id);
+
+                entity.HasIndex(x => x.ConversationId)
+                    .IsUnique();
+
+                // A user can wait in the queue only once (enforced by the DB, even on double-click)
+                entity.HasIndex(x => x.UserId)
+                    .IsUnique();
+
+                entity.Property(x => x.CreatedAt)
+                    .HasDefaultValueSql("GETUTCDATE()");
+
+                entity.HasOne(x => x.User)
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }

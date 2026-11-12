@@ -22,7 +22,6 @@ export function useChatbot() {
         try {
             setLoading(true);
             const response = await sendMessage(message);
-            console.log(response);
             setMessages(prev => [...prev, { sender: "bot", text: response.message }]);
         } catch (err) {
             setError(err instanceof Error ? err.message : "An unknown error occurred");
@@ -45,6 +44,8 @@ export function useChatbot() {
         setMessages(prev => [...prev, { sender: "user", text: message }]);
         void load(message);
     }, [load]);
+
+    
 
  
 

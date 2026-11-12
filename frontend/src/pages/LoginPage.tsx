@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     try {
       const response = await login({ email, password });
-      dispatch(loginAction(response.token));
+      dispatch(loginAction(response));
       navigate("/");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
@@ -30,7 +30,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     try {
       const response = await loginWithGoogleMock();
-      dispatch(loginAction(response.token));
+      dispatch(loginAction(response));
       navigate("/");
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {

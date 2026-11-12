@@ -69,6 +69,8 @@ builder.Services.AddScoped<ITradeRepository, TradeRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserStockRepository, UserStockRepository>();
+builder.Services.AddScoped<ISupportRequestRepository, SupportRequestRepository>();
+builder.Services.AddScoped<IChatbotService, ChatbotService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
