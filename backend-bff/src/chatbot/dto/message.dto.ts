@@ -1,4 +1,3 @@
-
-export interface MessageDto{
-    message:string;
+export interface MessageDto {
+  message: string;
 }

@@ -3,11 +3,11 @@ import { JwtStrategy } from '../common/guards/jwt.strategy';
 import { ChatbotController } from './chatbot.controller';
 import { ChatbotService } from './chatbot.service';
 import { HttpModule } from '@nestjs/axios';
-import { ChatGateway } from './chat.gateway';
+import { ChatbotGateway } from './chatbot.gateway';
 
 @Module({
   imports: [HttpModule],
   controllers: [ChatbotController],
-  providers: [ChatbotService, JwtStrategy, ChatGateway],
+  providers: [ChatbotService, JwtStrategy, ChatbotGateway],
 })
 export class ChatbotModule {}
