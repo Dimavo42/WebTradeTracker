@@ -6,6 +6,8 @@ import RegisterPage from "../pages/RegisterPage";
 import StockPage from "../pages/StockPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import HomePage from "../pages/HomePage";
+import AdminSupportPage from "../pages/AdminSupportPage";
+import AdminRoute from "./AdminRoute";
 import Chatbot from "../components/chatbot/Chatbot";
 import styles from "../styles/main.module.css";
 import { useLoadUserStocks } from "../hooks/useUserStocks";
@@ -23,6 +25,14 @@ export default function AppRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/stocks" element={<StockPage />} />
+        <Route
+          path="/admin/support"
+          element={
+            <AdminRoute>
+              <AdminSupportPage />
+            </AdminRoute>
+          }
+        />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       </main>

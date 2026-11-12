@@ -25,9 +25,12 @@ export class JwtSocketGuard extends AuthGuard('jwt') {
     };
   }
 
+  // Passport calls handleRequest(err, user, info, context, status) —
+  // `context` is the 4th argument, so `info` must be declared even though it's unused.
   handleRequest<TUser = JwtUser>(
     err: unknown,
     user: JwtUser | false,
+    _info: unknown,
     context: ExecutionContext,
   ): TUser {
     if (err || !user) {

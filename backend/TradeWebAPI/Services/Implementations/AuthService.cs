@@ -53,7 +53,8 @@ namespace TradeWebAPI.Services.Implementations
             {
                 Email = normalizedEmail,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                Role = "User"
+                // Only the two known roles are accepted; anything else becomes a normal user
+                Role = string.Equals(request.Role, "Admin", StringComparison.OrdinalIgnoreCase) ? "Admin" : "User"
             };
 
             await _userRepository.AddAsync(user);

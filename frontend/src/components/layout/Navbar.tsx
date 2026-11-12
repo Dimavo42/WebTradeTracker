@@ -16,6 +16,7 @@ export default function Navbar({ title = "Trade Tracker" }: NavbarProps) {
     (state) => state.auth.isAuthenticated
   );
   const token = useAppSelector((state) => state.auth.token);
+  const isAdmin = useAppSelector((state) => state.auth.role === "admin");
 
   // Navbar is on every page, so the session is watched in one place.
   // logout also clears the selected stocks (see userStocks slice), and
@@ -53,6 +54,11 @@ export default function Navbar({ title = "Trade Tracker" }: NavbarProps) {
             <NavLink to="/trades" className={linkClass}>
               Trades Journal
             </NavLink>
+            {isAdmin && (
+              <NavLink to="/admin/support" className={linkClass}>
+                Admin
+              </NavLink>
+            )}
             <button onClick={handleLogout} className={styles.logoutBtn}>
               Logout
             </button>

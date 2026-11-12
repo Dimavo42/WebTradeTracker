@@ -1,6 +1,18 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class RegisterDto {
+  // TEMPORARY: lets anyone register as an admin. Remove before going live.
+  @IsOptional()
+  @IsIn(['User', 'Admin'])
+  role?: 'User' | 'Admin';
+
   @IsEmail()
   @IsNotEmpty()
   email!: string;

@@ -192,6 +192,66 @@
   font-size: 13px;
 }
 
+/* ---- Admin (support) tab ---- */
+
+/* Centered "call an admin" / "chat ended" screen */
+.supportState {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  color: #374151;
+  font-size: 14px;
+  background: #f8f9fb;
+}
+
+.supportButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  background: #2e7df6;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.supportButton:hover:not(:disabled) {
+  background: #1f63c9;
+}
+
+.supportButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Status line above the conversation */
+.supportBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #eef4ff;
+  color: #1e3a8a;
+  font-size: 13px;
+}
+
+.supportEnd {
+  padding: 4px 10px;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  background: white;
+  color: #b91c1c;
+  font-size: 12px;
+  cursor: pointer;
+}
+
 .controls {
   display: flex;
   gap: 8px;
