@@ -1,12 +1,20 @@
 import { useEffect, useRef, useState } from "react";
 import { useChatbot } from "../../hooks/useChatbot";
 import styles from "./Chatbot.module.css";
+import { useAppSelector } from "../../hooks/reduxHooks";
+import { io } from "socket.io-client";
 
 export default function Chatbot() {
-  const { isOpen, loading, messages, error, sendUserMessage, toggleChatbot, clearMessages } =
+  const { isOpen, mode, setMode, loading, messages, error, sendUserMessage, toggleChatbot, clearMessages } =
     useChatbot();
   const [inputValue, setInputValue] = useState("");
   const listEndRef = useRef<HTMLDivElement>(null);
+  const isAuthenticated = useAppSelector(
+      (state) => state.auth.isAuthenticated
+    );
+  const token = useAppSelector(
+      (state) => state.auth.token
+    );
 
   // keep the newest message in view
   useEffect(() => {

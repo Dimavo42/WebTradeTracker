@@ -3,22 +3,27 @@ import { sendMessage } from "../api/chatbotApi";
 
 
 type ChatbotMessage = {
-  sender: "user" | "bot";
+  sender: "user" | "bot" | "admin";
   text: string;
 };
+
+export type ChatbotMode = "ai" | "admin";
 
 
 export function useChatbot() {
     const [isOpen, setIsOpen] = useState(false);
+    const [mode, setMode] = useState<ChatbotMode>("ai");
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState<ChatbotMessage[]>([]);
     const [error, setError] = useState<string | null>(null);
+
     
     const load = useCallback(async (message: string) => {
         try {
             setLoading(true);
             const response = await sendMessage(message);
-            setMessages(prev => [...prev, { sender: "bot", text: response }]);
+            console.log(response);
+            setMessages(prev => [...prev, { sender: "bot", text: response.message }]);
         } catch (err) {
             setError(err instanceof Error ? err.message : "An unknown error occurred");
         } finally {
@@ -41,6 +46,8 @@ export function useChatbot() {
         void load(message);
     }, [load]);
 
-    return { isOpen, loading, messages, error, sendUserMessage, toggleChatbot, clearMessages };
+ 
+
+    return { isOpen, mode, setMode, loading, messages, error, sendUserMessage, toggleChatbot, clearMessages };
 }
 

@@ -5,9 +5,10 @@ import { JournalModule } from './journal/journal.module';
 import { MarketModule } from './market/market.module';
 import { TimingInterceptor } from './common/interceptors/timing.interceptor';
 import { RequestLoggerMiddleware } from './common/middleware/requestLogger.middleware';
+import { ChatbotModule } from './chatbot/chatbot.module';
 
 @Module({
-  imports: [AuthModule, JournalModule, MarketModule],
+  imports: [AuthModule, JournalModule, MarketModule, ChatbotModule],
   providers: [
     {
       provide: APP_INTERCEPTOR,

@@ -26,8 +26,6 @@ services:
     networks:
       - trade_network  
 
-
-
   frontend:
     build:
       context: ./frontend
@@ -43,6 +41,37 @@ services:
     networks:
       - trade_network
 
+  ollama:
+    image: ollama/ollama
+    volumes:
+      - ollama_data:/root/.ollama
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        ollama serve &
+        server_pid=$$!
+
+        trap 'kill "$$server_pid" 2>/dev/null || true' EXIT
+        trap 'exit 0' TERM INT
+
+        until ollama list >/dev/null 2>&1; do
+          sleep 1
+        done
+
+        ollama pull llama3.2
+        wait "$$server_pid"
+    networks:
+      - trade_network
 
       
   bff:
@@ -59,10 +88,10 @@ services:
       PORT : "3000"
       FRONT_URL : "http://frontend:3000"
       MOBILE_ORIGIN: "*"
+      OLLAMA_BASE_URL: http://ollama:11434
     networks:
       - trade_network
       
-
 
   backend:
     build:
@@ -84,8 +113,6 @@ services:
     networks:
       - trade_network
 
-
-
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: trade_sql
@@ -98,8 +125,6 @@ services:
       - sql_data:/var/opt/mssql
     networks:
       - trade_network
-
-
 
 
   audit:
@@ -124,8 +149,6 @@ services:
      - trade_network
 
 
-
-
   tls:
    build:
       context: ./tls-server
@@ -147,12 +170,11 @@ services:
    networks:
      - trade_network
 
-
-
 volumes:
   sql_data:
   audit_data:
   tls_certs:
+  ollama_data:
   
    
 networks:
