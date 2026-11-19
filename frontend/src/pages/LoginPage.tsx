@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks/reduxHooks";
-import styles from "../styles/auth.module.css";
+import styles from "../styles/Auth.module.css";
 import { login as loginAction } from "../features/auth/authSlice";
 import ErrorMessage from "../components/common/ErrorMessage";
 import { useAuth } from "../hooks/useAuth";

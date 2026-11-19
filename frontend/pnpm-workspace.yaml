@@ -1,0 +1,7 @@
+allowBuilds:
+  esbuild: false
+permissions:
+  '@reduxjs/toolkit':
+    skills: false
+  dotenv:
+    skills: false
