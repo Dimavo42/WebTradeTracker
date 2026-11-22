@@ -36,7 +36,7 @@ interface SupportMessagePayload extends ConversationPayload {
   cors: {
     credentials: true,
     // Same rule as the REST CORS in main.ts
-    origin: ENV.MOBILE_ORIGIN === '*' ? true : [ENV.FRONT_URL],
+    origin: ENV.MOBILE_ORIGIN === '*' ? true : ENV.FRONT_URLS,
   },
 })
 @UseGuards(JwtSocketGuard)

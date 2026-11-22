@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 
 export class RegisterDto {
-  // TEMPORARY: lets anyone register as an admin. Remove before going live.
+  // Only honoured when ALLOW_ADMIN_SIGNUP=true (local testing). Otherwise everyone registers as User.
   @IsOptional()
   @IsIn(['User', 'Admin'])
   role?: 'User' | 'Admin';

@@ -1,0 +1,118 @@
+# Push to the `release` branch -> build images -> deploy to the public server.
+#
+# Repo settings → Secrets and variables → Actions:
+#   Variables: DOCKERHUB_USERNAME, DOMAIN, DEPLOY_HOST, DEPLOY_USER (optional, default "ubuntu"),
+#              COMPOSE_PROFILES (optional, "ai" to run the Ollama chatbot)
+#   Secrets:   DOCKERHUB_TOKEN, DEPLOY_SSH_KEY, SA_PASSWORD, JWT_KEY,
+#              DEPLOY_KNOWN_HOSTS (optional; output of `ssh-keyscan <host>`, otherwise trusted on first use)
+name: Release
+
+on:
+  push:
+    branches: [release]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  images:
+    name: Build ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: frontend
+            context: frontend
+            file: frontend/Dockerfile
+          - name: bff
+            context: backend-bff
+            file: backend-bff/Dockerfile
+          - name: api
+            context: .
+            file: backend/TradeWebAPI/Dockerfile
+          - name: audit
+            context: audit
+            file: audit/Dockerfile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
+          push: true
+          tags: |
+            ${{ vars.DOCKERHUB_USERNAME }}/webtrade-${{ matrix.name }}:${{ github.sha }}
+            ${{ vars.DOCKERHUB_USERNAME }}/webtrade-${{ matrix.name }}:latest
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}
+
+  deploy:
+    name: Deploy
+    needs: images
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://${{ vars.DOMAIN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: pipx install ansible-core
+
+      - name: Set up SSH and inventory
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          HOST: ${{ vars.DEPLOY_HOST }}
+          SSH_USER: ${{ vars.DEPLOY_USER || 'ubuntu' }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          if [ -n "$KNOWN_HOSTS" ]; then
+            printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          else
+            ssh-keyscan -H "$HOST" > ~/.ssh/known_hosts
+          fi
+          printf '[webtrade]\n%s ansible_user=%s ansible_ssh_private_key_file=~/.ssh/deploy_key\n' \
+            "$HOST" "$SSH_USER" > "$RUNNER_TEMP/inventory.ini"
+
+      - name: Deploy with Ansible
+        working-directory: infra/ansible
+        env:
+          DOCKER_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+          IMAGE_TAG: ${{ github.sha }}
+          DOMAIN: ${{ vars.DOMAIN }}
+          SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+          COMPOSE_PROFILES: ${{ vars.COMPOSE_PROFILES }}
+        run: ansible-playbook deploy.yml -i "$RUNNER_TEMP/inventory.ini"
+
+      - name: Smoke test
+        env:
+          DOMAIN: ${{ vars.DOMAIN }}
+        run: |
+          # The API needs a moment after SQL Server + Kafka come up
+          for i in $(seq 1 30); do
+            if curl -fsS "https://$DOMAIN/api/market/filters" > /dev/null; then
+              echo "Live at https://$DOMAIN"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "App did not answer on https://$DOMAIN/api/market/filters" >&2
+          exit 1
