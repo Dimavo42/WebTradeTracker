@@ -20,7 +20,7 @@ const corsOptions: CorsOptionsDelegate<Request> = (
     origin = rawOrigin[0];
   }
 
-  const allowed = [ENV.FRONT_URL];
+  const allowed = ENV.FRONT_URLS;
 
   if (!origin) {
     return callback(null, {
@@ -43,9 +43,7 @@ const corsOptions: CorsOptionsDelegate<Request> = (
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   app.enableCors(corsOptions);
-
   app.setGlobalPrefix('api');
   await app.listen(ENV.PORT);
 }

@@ -69,11 +69,16 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {
+    // On a public deployment nobody may self-register as Admin
+    const payload: RegisterDto = ENV.ALLOW_ADMIN_SIGNUP
+      ? dto
+      : { ...dto, role: 'User' };
+
     try {
       const response = await firstValueFrom(
         this.httpService.post<AuthResponseDto>(
           `${this.backendUrl}/api/auth/register`,
-          dto,
+          payload,
         ),
       );
 

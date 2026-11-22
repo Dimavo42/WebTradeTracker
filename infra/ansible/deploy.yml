@@ -1,32 +1,85 @@
+# Deploys the public stack to an Ubuntu 22.04/24.04 server.
+# Settings come from environment variables (set by .github/workflows/release.yml,
+# or export them yourself when running locally):
+#   DOCKER_USERNAME  IMAGE_TAG  DOMAIN  SA_PASSWORD  JWT_KEY  [COMPOSE_PROFILES=ai]
 - hosts: webtrade
   become: yes
 
+  vars:
+    app_dir: /opt/webtrade
+    docker_username: "{{ lookup('env', 'DOCKER_USERNAME') }}"
+    image_tag: "{{ lookup('env', 'IMAGE_TAG') | default('latest', true) }}"
+    domain: "{{ lookup('env', 'DOMAIN') }}"
+    sa_password: "{{ lookup('env', 'SA_PASSWORD') }}"
+    jwt_key: "{{ lookup('env', 'JWT_KEY') }}"
+    compose_profiles: "{{ lookup('env', 'COMPOSE_PROFILES') }}"
+
   tasks:
 
-    - name: Install Docker
+    - name: Check required settings
+      assert:
+        that:
+          - docker_username | length > 0
+          - domain | length > 0
+          - sa_password | length >= 8
+          - jwt_key | length >= 32
+        fail_msg: "Set DOCKER_USERNAME, DOMAIN, SA_PASSWORD (8+ chars) and JWT_KEY (32+ chars)"
+        quiet: true
+
+    - name: Install Docker and the Compose v2 plugin
       apt:
         name:
           - docker.io
+          - docker-compose-v2
         update_cache: yes
         state: present
 
+    - name: Ensure Docker is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
     - name: Ensure app folder exists
       file:
-        path: /opt/webtrade
+        path: "{{ app_dir }}"
         state: directory
         mode: '0755'
 
-    - name: Copy docker compose file
+    - name: Copy compose file and Caddyfile
       copy:
-        src: files/docker-compose.prod.yml
-        dest: /opt/webtrade/docker-compose.prod.yml
+        src: "files/{{ item }}"
+        dest: "{{ app_dir }}/{{ item }}"
+        mode: '0644'
+      loop:
+        - docker-compose.prod.yml
+        - Caddyfile
 
-    - name: Copy env file
+    - name: Write .env (secrets, readable by root only)
       copy:
-        src: files/.env
-        dest: /opt/webtrade/.env
+        dest: "{{ app_dir }}/.env"
+        mode: '0600'
+        content: |
+          DOCKER_USERNAME={{ docker_username }}
+          IMAGE_TAG={{ image_tag }}
+          DOMAIN={{ domain }}
+          SA_PASSWORD='{{ sa_password }}'
+          JWT_KEY='{{ jwt_key }}'
+          COMPOSE_PROFILES={{ compose_profiles }}
+      no_log: true
 
-    - name: Start app
-      shell: docker compose -f docker-compose.prod.yml up -d
+    - name: Pull images for this release
+      command: docker compose -f docker-compose.prod.yml pull
       args:
-        chdir: /opt/webtrade
+        chdir: "{{ app_dir }}"
+      changed_when: true
+
+    - name: Start / update the app
+      command: docker compose -f docker-compose.prod.yml up -d --remove-orphans
+      args:
+        chdir: "{{ app_dir }}"
+      changed_when: true
+
+    - name: Remove images from previous releases
+      command: docker image prune -f
+      changed_when: false

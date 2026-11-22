@@ -1,53 +1,86 @@
+name: webtrade
+
+# Public deployment. Rendered .env on the server provides:
+#   DOCKER_USERNAME, IMAGE_TAG, DOMAIN, SA_PASSWORD, JWT_KEY
+#
+# Only Caddy is published (80/443, automatic Let's Encrypt HTTPS for $DOMAIN).
+# Everything else is reachable only inside trade_network.
+
+x-restart: &restart
+  restart: unless-stopped
+
 services:
-  frontend:
-    image: ${DOCKER_USERNAME}/webtrade-frontend:${IMAGE_TAG}
-    container_name: trade_frontend
+  caddy:
+    <<: *restart
+    image: caddy:2-alpine
+    container_name: trade_caddy
     ports:
-       - "3000:80"
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN is required}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+    networks:
+      - trade_network
+
+  frontend:
+    <<: *restart
+    # Built with BASE_URL=/api; its nginx proxies /api and /socket.io to the BFF
+    image: ${DOCKER_USERNAME:?DOCKER_USERNAME is required}/webtrade-frontend:${IMAGE_TAG:-latest}
+    container_name: trade_frontend
     depends_on:
       - bff
     networks:
       - trade_network
 
   bff:
-    image: ${DOCKER_USERNAME}/webtrade-bff:${IMAGE_TAG}
+    <<: *restart
+    image: ${DOCKER_USERNAME}/webtrade-bff:${IMAGE_TAG:-latest}
     container_name: trade_bff
-    ports:
-    - "3001:3000"
     environment:
       DOTNET_API_URL: http://backend:8080
-      JWT_KEY: ${JWT_KEY}
-      JWT_ISSUER: ${JWT_ISSUER}
-      JWT_AUDIENCE: ${JWT_AUDIENCE}
+      PORT: "3000"
+      FRONT_URL: https://${DOMAIN}
+      JWT_KEY: ${JWT_KEY:?JWT_KEY is required}
+      ALLOW_ADMIN_SIGNUP: "false"
+      OLLAMA_BASE_URL: http://ollama:11434
     depends_on:
       - backend
     networks:
       - trade_network
 
   backend:
-    restart: always
-    image: ${DOCKER_USERNAME}/webtrade-api:${IMAGE_TAG}
+    <<: *restart
+    image: ${DOCKER_USERNAME}/webtrade-api:${IMAGE_TAG:-latest}
     container_name: trade_backend
-    ports:
-      - "5000:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__Sql: "Server=db;Database=TradeDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;"
+      ConnectionStrings__Sql: "Server=db;Database=TradeDb;User Id=sa;Password=${SA_PASSWORD:?SA_PASSWORD is required};TrustServerCertificate=True;"
       Jwt__Key: ${JWT_KEY}
-      Jwt__Issuer: ${JWT_ISSUER}
-      Jwt__Audience: ${JWT_AUDIENCE}
+      Kafka__BootstrapServers: "kafka:29092"
     depends_on:
       db:
+        condition: service_healthy
+      kafka:
         condition: service_healthy
     networks:
       - trade_network
 
   db:
+    <<: *restart
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: trade_sql
     environment:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: ${SA_PASSWORD}
+      # Stop SQL Server from taking most of the VM's RAM
+      MSSQL_MEMORY_LIMIT_MB: ${MSSQL_MEMORY_LIMIT_MB:-2048}
     volumes:
       - sql_data:/var/opt/mssql
     healthcheck:
@@ -58,8 +91,79 @@ services:
     networks:
       - trade_network
 
+  kafka:
+    <<: *restart
+    image: apache/kafka:4.1.2
+    container_name: trade_kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: INTERNAL://:29092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_HEAP_OPTS: "-Xms256m -Xmx512m"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server kafka:29092 > /dev/null 2>&1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 15s
+    networks:
+      - trade_network
+
+  audit:
+    <<: *restart
+    image: ${DOCKER_USERNAME}/webtrade-audit:${IMAGE_TAG:-latest}
+    container_name: trade_audit
+    environment:
+      PORT: "3002"
+      KAFKA_BROKERS: "kafka:29092"
+      KAFKA_GROUP_ID: "trade-audit"
+      AUDIT_DB_PATH: /data
+    volumes:
+      - audit_data:/data
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - trade_network
+
+  # Optional AI chatbot. Off by default; enable with COMPOSE_PROFILES=ai in the server's .env.
+  # Runs on CPU here (slow but works with ~4 GB extra RAM). On a GPU VM, add the
+  # deploy.resources.reservations.devices block from the root docker-compose.yml.
+  ollama:
+    <<: *restart
+    image: ollama/ollama
+    profiles: ["ai"]
+    container_name: trade_ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        ollama serve &
+        server_pid=$$!
+        trap 'kill "$$server_pid" 2>/dev/null || true' EXIT
+        trap 'exit 0' TERM INT
+        until ollama list >/dev/null 2>&1; do sleep 1; done
+        ollama pull llama3.2
+        wait "$$server_pid"
+    networks:
+      - trade_network
+
 volumes:
   sql_data:
+  audit_data:
+  caddy_data:
+  caddy_config:
+  ollama_data:
 
 networks:
   trade_network:

@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import styles from "../styles/auth.module.css";
+import styles from "../styles/Auth.module.css";
 import { useAppDispatch } from "../hooks/reduxHooks";
 import { login as loginAction } from "../features/auth/authSlice";
 import { useAuth } from "../hooks/useAuth";
 import ErrorMessage from "../components/common/ErrorMessage";
 import type { UserRole } from "../types/auth";
+import { ENV } from "../common/env";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { register, loading, error } = useAuth();
-
   const [form, setForm] = useState<{
     email: string;
     password: string;
@@ -75,18 +75,20 @@ export default function RegisterPage() {
           required
         />
 
-        {/* TEMPORARY: role picker for testing the admin area */}
-        <label className={styles.field}>
-          Role
-          <select
-            className={styles.select}
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value as UserRole })}
-          >
-            <option value="User">User</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </label>
+        {/* Role picker for testing the admin area — only when built with ALLOW_ADMIN_SIGNUP=true */}
+        {ENV.ALLOW_ADMIN_SIGNUP && (
+          <label className={styles.field}>
+            Role
+            <select
+              className={styles.select}
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value as UserRole })}
+            >
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </label>
+        )}
 
          <button type="submit" disabled={loading}>
           {loading ? "Registering..." : "Register"}

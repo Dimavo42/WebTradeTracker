@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import type { JwtUser } from '../types/jwtUser.type';
+import { ENV } from '../env';
 
 interface DotnetJwtPayload {
   nameid: string;
@@ -19,9 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: 'ThisIsMySuperSecretJwtKey1234567890',
-      issuer: 'TradeWebAPI',
-      audience: 'TradeWebAPIUsers',
+      secretOrKey: ENV.JWT_KEY,
+      issuer: ENV.JWT_ISSUER,
+      audience: ENV.JWT_AUDIENCE,
     });
   }
 
